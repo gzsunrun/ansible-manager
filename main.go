@@ -19,7 +19,7 @@ const (
 	SERVICE_NAME = "ansible-manager"
 	SERVICE_DESC = "ansible-manager"
 	LOG_PATH     = "/var/log/ansible-manager/log.log"
-	CONFIG_PATH  = "/etc/ansible_manager/ansible-manager.conf"
+	CONFIG_PATH  = "/etc/ansible-manager/ansible-manager.conf"
 )
 
 func run() {

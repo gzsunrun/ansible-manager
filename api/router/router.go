@@ -2,8 +2,6 @@ package router
 
 import (
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/gorilla/mux"
 	"github.com/gzsunrun/ansible-manager/api/project"
@@ -11,11 +9,7 @@ import (
 )
 
 func NewRouter(root *mux.Router) {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		return
-	}
-	dir = "/root/go/src/github.com/gzsunrun/ansible-manager"
+	dir := "/var/lib/ansible-manager"
 	root.PathPrefix("/ui/").Handler(http.StripPrefix("/ui/", http.FileServer(http.Dir(dir+"/public/"))))
 	root.HandleFunc("/ws", sockets.Handler)
 	root.HandleFunc("/api/login", project.Login)
