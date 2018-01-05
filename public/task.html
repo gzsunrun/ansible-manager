@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link type="text/css" href="zui/css/zui.min.css" rel="stylesheet">
+    <style>
+        .body-head{
+            text-align: right;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+  <table class="table">
+      <thead>
+          <tr>
+            <th>ID</th>
+            <th>Task_Name</th>
+            <th>Task_Status</th>
+            <th style="text-align:right;">Options</th>
+          </tr>
+        </thead>
+  <tbody id="task-list">
+  </tbody>
+
+</table>
+</body>
+<script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+<script type="text/javascript" src="zui/js/zui.min.js"></script>
+<script>
+    task_list()
+        function task_list(){
+            $("#task-list").empty();
+            $.ajax({
+                    type: "post",
+                    url: "../api/project/task",
+                    data: {
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                       var obj= JSON.parse(msg)
+                            $.each(obj, function(i, val) {
+                                var stopBtn="disabled"
+                                    if (val.task_status=="running"){
+                                        stopBtn=""
+                                    }
+                                    $("#task-list").append(`<tr>
+                                    <td>`+val.task_id+`</td>
+                                    <td>`+val.task_name+`</td>
+                                    <td>`+val.task_status+`</td>
+                                    <td style="text-align:right;">
+                                            <button onclick="view_task(`+val.task_id+`,'`+val.task_name+`')" class="btn btn-sm" type="button">
+                                                <i class="icon icon-eye-open"></i>
+                                            </button>
+                                            <button onclick="stop_task(`+val.task_id+`)" `+stopBtn+` class="btn btn-sm" type="button">
+                                                <i class="icon icon-stop"></i>
+                                            </button>
+                                            <button onclick="delete_task(`+val.task_id+`)" class="btn btn-sm btn-danger" type="button">
+                                                <i class="icon icon-trash"></i>
+                                            </button>
+                                    </td>
+                                    </tr>`);
+                            });        
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        $("#task-list").append("<tr><td colspan='6'>没加载到数据</td></tr>");
+                    }
+            });
+        }
+
+       
+       function view_task(task_id,task_name){
+        var taskModalTrigger = new $.zui.ModalTrigger({
+                              title:"任务："+task_name,
+                              size:"fullscreen",
+                              iframe:"home.html?task_id="+task_id
+                              });
+                            taskModalTrigger.show();
+       }
+
+
+        function delete_task(task_id){
+           $.ajax({
+                    type: "post",
+                    url: "../api/project/task/delete",
+                    data: {
+                      task_id:task_id
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                        task_list()    
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        new $.zui.Messager(obj.data, {
+                                type: 'danger' 
+                                }).show();
+                    }
+            });
+        }
+
+        function stop_task(task_id){
+           $.ajax({
+                    type: "post",
+                    url: "../api/project/task/stop",
+                    data: {
+                      task_id:task_id
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                        new $.zui.Messager("请求已提交", {
+                                type: 'success' 
+                                }).show();  
+                                task_list()  
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        new $.zui.Messager(obj.data, {
+                                type: 'danger' 
+                                }).show();
+                    }
+            });
+        }
+</script>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link type="text/css" href="zui/css/zui.min.css" rel="stylesheet">
+    <style>
+        .body-head{
+            text-align: right;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+        <div>
+                <ol class="breadcrumb">
+                        <li><a href="repository.html">脚本管理</a></li>
+                        <li class="active" id="project-name">参数设置</li>
+                </ol>
+            </div>
+    <div class="body-head">
+                <button  type="button" class="btn btn-success" onclick="add()">添加参数</button>
+    </div>
+    <!-- 对话框HTML -->
+    <div class="modal fade" id="myModal">
+            <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
+                        <h4 class="modal-title">参数</h4>
+                      </div>
+                      <div class="modal-body">
+                            <form class="form-horizontal">
+                                    <input type="hidden"  id="vars-id" value="">
+                                    <div class="form-group">
+                                      <label for="vars-name" class="col-sm-2">参数名</label>
+                                      <div class="col-md-9 col-sm-10">
+                                        <input type="text" class="form-control" id="vars-name" placeholder="参数名">
+                                      </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="vars-path" class="col-sm-2">参数文件</label>
+                                        <div class="col-md-9 col-sm-10">
+                                          <input type="text" class="form-control" id="vars-path" placeholder="参数文件">
+                                        </div>
+                                      </div>
+                                    <div class="form-group">
+                                            <label for="vars-value" class="col-sm-2">参数值</label>
+                                            <div class="col-md-9 col-sm-10">
+                                                    <textarea class="form-control" rows="10" id="vars-value" placeholder="参数值"></textarea>
+                                            </div>
+                                    </div>
+                             </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" onclick="create_vars()" class="btn btn-primary">提交</button>
+                      </div>
+                    </div>
+                  </div> 
+    </div>
+  <table class="table">
+  <tbody id="vars-list">
+  </tbody>
+
+</table>
+</body>
+<script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+<script type="text/javascript" src="zui/js/zui.min.js"></script>
+<script>
+    var repo_id=getQueryString("repo_id")
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    }
+
+    vars_list()
+    
+        function vars_list(){
+            $("#vars-list").empty();
+            $.ajax({
+                    type: "get",
+                    url: "../api/repo/vars",
+                    data: {
+                        repo_id:repo_id
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                        var obj = JSON.parse(msg);
+                            $.each(obj, function(i, val) {
+                                    $("#vars-list").append(`<tr>
+                                    <td>`+val.vars_id+`</td>
+                                    <td>`+val.vars_name+`</td>
+                                    <td style="text-align:right;">
+                                            <button onclick="edit_vars(`+val.vars_id+`)" class="btn btn-sm" type="button">
+                                                <i class="icon icon-edit"></i>
+                                            </button>
+                                            <button onclick="delete_vars(`+val.vars_id+`)" class="btn btn-sm btn-danger" type="button">
+                                                <i class="icon icon-trash"></i>
+                                            </button>
+                                    </td>
+                                    </tr>`);
+                            });          
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        $("#vars-list").append("<tr><td colspan='6'>没加载到数据</td></tr>");
+                    }
+            });
+        }
+
+        function add(){
+            $("#vars-id").val("")
+             $("#vars-name").val("")
+             $("#vars-path").val("")
+            $("#vars-value").val("")
+            $('#myModal').modal('show');
+        }
+        function create_vars(){
+           var vars_name= $("#vars-name").val()
+           var vars_id= $("#vars-id").val()
+           var vars_value= $("#vars-value").val()
+           var vars_path= $("#vars-path").val()
+           if (vars_name==""){
+               alert("参数名不能为空")
+               return
+           }
+           var url
+           if (vars_id=="")
+                url="../api/repo/vars/create"
+            else
+                url="../api/repo/vars/update"
+           $.ajax({
+                    type: "post",
+                    url: url,
+                    data: {
+                        vars_name:vars_name,
+                        repo_id:repo_id,
+                        vars_id:vars_id,
+                        vars_value:vars_value,
+                        vars_path:vars_path
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                            $('#myModal').modal('hide');
+                            vars_list()      
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        new $.zui.Messager(obj.data, {
+                                type: 'danger' 
+                                }).show();
+                    }
+            });
+        }
+
+        function delete_vars(vars_id){
+           $.ajax({
+                    type: "get",
+                    url: "../api/repo/vars/delete",
+                    data: {
+                        vars_id:vars_id
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) { 
+                        vars_list()    
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        new $.zui.Messager(obj.data, {
+                                type: 'danger' 
+                                }).show();
+                    }
+            });
+        }
+
+        function edit_vars(vars_id){
+            $.ajax({
+                    type: "get",
+                    url: "../api/repo/vars/get",
+                    data: {
+                        vars_id:vars_id
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                        var obj = JSON.parse(msg);
+                            $("#vars-id").val(obj.vars_id)
+                            $("#vars-name").val(obj.vars_name)
+                            $("#vars-path").val(obj.vars_path)
+                            $("#vars-value").val(obj.vars_value)
+                            $('#myModal').modal('show');
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {}
+            });
+        }
+        
+</script>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link type="text/css" href="zui/css/zui.min.css" rel="stylesheet">
+    <style>
+        .body-head{
+            text-align: right;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="body-head">
+                <button  type="button" class="btn btn-success" onclick="add()">创建项目</button>
+    </div>
+    <!-- 对话框HTML -->
+    <div class="modal fade" id="myModal">
+            <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
+                        <h4 class="modal-title">创建项目</h4>
+                      </div>
+                      <div class="modal-body">
+                            <form class="form-horizontal">
+                                    <input type="hidden"  id="project-id" value="">
+                                    <div class="form-group">
+                                      <label for="exampleInputAccount4" class="col-sm-2">项目名</label>
+                                      <div class="col-md-6 col-sm-10">
+                                        <input type="text" class="form-control" id="project-name" placeholder="项目名">
+                                      </div>
+                                    </div>
+                             </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" onclick="create_project()" class="btn btn-primary">提交</button>
+                      </div>
+                    </div>
+                  </div> 
+    </div>
+  <table class="table">
+  <tbody id="project-list">
+    <tr>
+            <td>1</td>
+      <td>test</td>
+      <td style="text-align:right;">
+            <button class="btn btn-sm" type="button">
+                    <i class="icon icon-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" type="button">
+              <i class="icon icon-trash"></i>
+            </button>
+        </td>
+    </tr>
+  </tbody>
+
+</table>
+</body>
+<script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+<script type="text/javascript" src="zui/js/zui.min.js"></script>
+<script>
+    project_list()
+    
+        function project_list(){
+            $("#project-list").empty();
+            $.ajax({
+                    type: "post",
+                    url: "../api/project",
+                    data: {
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                            var obj = JSON.parse(msg);
+                            $.each(obj, function(i, val) {
+                                    $("#project-list").append(`<tr>
+                                    <td>`+val.project_id+`</td>
+                                    <td>`+val.project_name+`</td>
+                                    <td style="text-align:right;">
+                                            <a href="template.html?project_id=`+val.project_id+`&project_name=`+val.project_name+`">
+                                                <button  class="btn btn-sm" type="button" title="任务模板">
+                                                    <i class="icon icon-book"></i>
+                                                </button></a>
+                                            <a href="hosts.html?project_id=`+val.project_id+`&project_name=`+val.project_name+`">
+                                                <button  class="btn btn-sm" type="button" title="添加主机">
+                                                <i class="icon icon-desktop"></i>
+                                            </button></a>
+                                            <button onclick="edit_project(`+val.project_id+`)" class="btn btn-sm" type="button">
+                                                <i class="icon icon-edit"></i>
+                                            </button>
+                                            <button onclick="delete_project(`+val.project_id+`)" class="btn btn-sm btn-danger" type="button">
+                                                <i class="icon icon-trash"></i>
+                                            </button>
+                                    </td>
+                                    </tr>`);
+                            });  
+                            
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        $("#project-list").append("<tr><td colspan='6'>没加载到数据</td></tr>");
+                    }
+            });
+        }
+
+        function add(){
+            $("#project-name").val("")
+            $("#project-id").val("")
+            $('#myModal').modal('show');
+        }
+
+        function create_project(){
+           var project_name= $("#project-name").val()
+           var project_id= $("#project-id").val()
+           if (project_name==""){
+               alert("项目名不能为空")
+               return
+           }
+           var url
+           if (project_id=="")
+                url="../api/project/create"
+            else
+                url="../api/project/update"
+           $.ajax({
+                    type: "post",
+                    url: url,
+                    data: {
+                        project_name:project_name,
+                        project_id:project_id
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                            $("#project-name").val("")
+                            $("#project-id").val("")
+                            $('#myModal').modal('hide');
+                            project_list() 
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        new $.zui.Messager("操作失败", {
+                                type: 'danger' 
+                                }).show();
+                    }
+            });
+        }
+
+        function delete_project(project_id){
+           $.ajax({
+                    type: "post",
+                    url: "../api/project/delete",
+                    data: {
+                        project_id:project_id
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                        
+                        project_list()    
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        new $.zui.Messager("删除失败", {
+                                type: 'danger' 
+                                }).show();
+                    }
+            });
+        }
+
+        function edit_project(project_id){
+            $.ajax({
+                    type: "post",
+                    url: "../api/project/get",
+                    data: {
+                        project_id:project_id
+                    },
+                    beforeSend: function() {},
+                    success: function(msg) {
+                        var obj = JSON.parse(msg);
+                        $("#project-id").val(obj.project_id)
+                        $("#project-name").val(obj.project_name)
+                        $('#myModal').modal('show');
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {}
+            });
+        }
+        
+</script>
+</html>
