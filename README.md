@@ -46,37 +46,6 @@ bucket_name=ansible-playbook
 - 访问`http://your ip:8090/ui/login.html` 默认账户:`admin`,密码:`123456`
 
 
-## sunruniaas-ansible 
-
-IaaS 平台应用编排组件
-
-### 依赖
-
-- rpc
-- ansible
-- s3
-- mariadb
-
-### 安装
-
-`配置文件 /etc/sunrun/sunruniaas.conf`
-
-``` 
-
-[data_source]
-......
-
-[backup_storage]
-......
-
-[ansible]
-port = 8090
-work_path = /tmp
-concurrent = 5
-bucket = ansible-playbook
-
-
-```
 ## 脚本规范
 
 ### 脚本压缩包
@@ -94,7 +63,6 @@ bucket = ansible-playbook
 --group.yml
 --host
 --index.yml
---logo.png
 --tag.yml
 
 ```
