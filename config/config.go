@@ -13,16 +13,19 @@ type Config struct {
 	AnsibleManager AnsibleManager `ini:"ansible_manager"`
 }
 type AnsibleManager struct {
-	Port       int    `ini:"port"`
-	Concurrent int    `ini:"concurrent"`
-	WorkPath   string `ini:"work_path"`
-	MysqlURL   string `ini:"mysql_url"`
-	S3Status   bool   `ini:"s3"`
-	S3URL      string `ini:"s3_endpoint"`
-	S3Key      string `ini:"s3_key"`
-	S3Secret   string `ini:"s3_secret"`
-	BucketName string `ini:"bucket_name"`
-	JwtSecret  string `ini:"jwt_secret"`
+	Port       		int    `ini:"port"`
+	Concurrent 		int    `ini:"concurrent"`
+	WorkPath   		string `ini:"work_path"`
+	MysqlURL   		string `ini:"mysql_url"`
+	MysqlName   	string `ini:"mysql_name"`
+	MysqlUser   	string `ini:"mysql_user"`
+	MysqlPassword   string `ini:"mysql_password"`
+	S3Status   		bool   `ini:"s3"`
+	S3URL      		string `ini:"s3_endpoint"`
+	S3Key      		string `ini:"s3_key"`
+	S3Secret   		string `ini:"s3_secret"`
+	BucketName 		string `ini:"bucket_name"`
+	JwtSecret  		string `ini:"jwt_secret"`
 }
 
 var Cfg = &Config{}

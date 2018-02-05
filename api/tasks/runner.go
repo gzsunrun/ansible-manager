@@ -78,6 +78,7 @@ func newTask(taskID int) error {
 		newTask.TaskContent.End = time.Now()
 		newTask.updateStatus()
 		newTask.saveLog()
+		newTask.clcRepo()
 	}()
 	newTask.log("[DOWNLOAD REPOSITORY]")
 	err = newTask.downloadRepository()
@@ -100,7 +101,6 @@ func newTask(taskID int) error {
 		newTask.TaskContent.Status = "error"
 		return err
 	}
-	newTask.clcRepo()
 	newTask.TaskContent.Status = "finish"
 	return nil
 }
@@ -221,7 +221,9 @@ func (t *Task) installVars() error {
 		logs.Error(err)
 		return err
 	}
-	err = tmpl.Execute(fd, data)
+	var parse db.Parse
+	err=json.Unmarshal([]byte(t.TplContent.PlaybookParse),&parse)
+	err = tmpl.Execute(fd, parse)
 	if err != nil {
 		logs.Error(err)
 		return err

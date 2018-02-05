@@ -26,7 +26,7 @@ func run() {
 	os.MkdirAll(config.Cfg.AnsibleManager.WorkPath+"/repo", 0664)
 	s3.NewClient()
 	sockets.StartWS()
-	db.NewDB(config.Cfg.AnsibleManager.MysqlURL)
+	db.NewDB()
 	go tasks.RunTask()
 	root := mux.NewRouter()
 	router.NewRouter(root)

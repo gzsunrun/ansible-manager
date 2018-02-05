@@ -2,9 +2,11 @@ package db
 
 import (
 	"time"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
+	"github.com/gzsunrun/ansible-manager/config"
 )
 
 type User struct {
@@ -40,11 +42,43 @@ type Host struct {
 	ID        int    `xorm:"host_id" json:"host_id"`
 	ProjectID int    `xorm:"project_id" json:"project_id"`
 	Alias     string `xorm:"host_alias" json:"host_alias"`
-	Name      string `xorm:"host_name" json:"host_name"`
+	HostName  string `xorm:"host_name" json:"host_name"`
 	IP        string `xorm:"host_ip" json:"host_ip"`
 	User      string `xorm:"host_user" json:"host_user"`
-	Password  string `xorm:"host_password" json:"-"`
-	Key       string `xorm:"host_key" json:"-"`
+	Password  string `xorm:"host_password" json:"host_password"`
+	Key       string `xorm:"host_key" json:"host_key"`
+}
+
+type GroupAttr struct {
+	Key   string `json:"key"`
+	Type string  `json:"type"`
+	Value string `json:"value"`
+}
+
+type GroupHosts struct {
+	//Name string          `json:"host_name"`
+	HostUUID string      `json:"host_uuid"`
+	Attr     []GroupAttr `json:"attr"`
+	HostName string 	 `json:"host_name"`
+	IP       string 	 `json:"-"`
+}
+
+type GroupRole struct {
+	Name  string       `json:"group_name"`
+	Hosts []GroupHosts `json:"hosts"`
+	Attr  []GroupAttr  `json:"attr"`
+}
+
+type RoleVars struct {
+	Path  string 				 `json:"vars_path"`
+	Value map[string]interface{} `json:"vars_value"`
+	Name  string 				 `json:"vars_name"`
+}
+
+type Parse struct{
+	Hosts []Host 		`json:"hosts"`
+	Group []GroupRole 	`json:"group"`
+	Vars  []RoleVars  	`json:"vars"`
 }
 
 type Task struct {
@@ -76,8 +110,14 @@ type Output struct {
 
 var MysqlDB *xorm.Engine
 
-func NewDB(url string) error {
+func NewDB() error {
 	var err error
-	MysqlDB, err = xorm.NewEngine("mysql", url)
+	dbURL := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
+		config.Cfg.AnsibleManager.MysqlUser,
+		config.Cfg.AnsibleManager.MysqlPassword,
+		config.Cfg.AnsibleManager.MysqlURL,
+		config.Cfg.AnsibleManager.MysqlName)
+
+	MysqlDB, err = xorm.NewEngine("mysql", dbURL)
 	return err
 }
