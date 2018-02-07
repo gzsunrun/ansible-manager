@@ -39,7 +39,7 @@ func readVars(filePath string) (*varsStruct, error) {
 	cmd := exec.Command("tar", "zxvf", filePath, "-C", dir)
 	err = cmd.Run()
 	if err != nil {
-		logs.Error(err)
+		logs.Error("tar",err)
 		return nil, err
 	}
 	groupY, err := ioutil.ReadFile(dir + "/group.yml")
@@ -80,6 +80,9 @@ func readVars(filePath string) (*varsStruct, error) {
 		_, file := filepath.Split(fpath)
 		vals["name"] = strings.Replace(file, path.Ext(file), "", -1)
 		vals["path"] = strings.Replace(fpath, dir+"/", "", -1)
+		if strings.Contains(vals["path"],"_struct.yml"){
+			continue
+		}
 		vals["value"] = string(val)
 		vars = append(vars, vals)
 	}

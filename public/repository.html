@@ -15,7 +15,8 @@
 </head>
 <body>
     <div class="body-head">
-                <button  type="button" class="btn btn-success" onclick="add()">添加脚本</button>
+                <button  type="button" class="btn btn-success" onclick="add()">上传脚本</button>
+                <button  type="button" class="btn" onclick="import_git()">从git导入脚本</button>
     </div>
     <!-- 对话框HTML -->
     <div class="modal fade" id="myModal">
@@ -54,6 +55,43 @@
                       </div>
                     </div>
                   </div> 
+    </div>
+    <div class="modal fade" id="gitModal">
+        <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
+                    <h4 class="modal-title">从git导入脚本</h4>
+                  </div>
+                  <div class="modal-body">
+                        <form class="form-horizontal">
+                              
+                                <div class="form-group">
+                                  <label for="key-name" class="col-sm-2">脚本名</label>
+                                  <div class="col-md-9 col-sm-10">
+                                    <input type="text" class="form-control" id="repo-name2" placeholder="脚本名">
+                                  </div>
+                                </div>
+                                <div class="form-group">
+                                        <label for="repo-path" class="col-sm-2">git地址</label>
+                                        <div class="col-md-9 col-sm-10">
+                                                <input type="text" class="form-control" id="repo-path2"  placeholder="https://user:password@xxx.git" >
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="key-name" class="col-sm-2">详情</label>
+                                    <div class="col-md-9 col-sm-10">
+                                        <textarea class="form-control" id="repo-desc2" rows="10"></textarea>
+                                    </div>
+                                  </div>
+                         </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" id="import" onclick="import_repo()" class="btn btn-primary">提交</button>
+                  </div>
+                </div>
+              </div> 
     </div>
   <table class="table">
   <tbody id="repo-list">
@@ -96,6 +134,32 @@
             });
         }
 
+        function import_repo(){
+           var repo_name=$("#repo-name2").val()
+           var repo_path=$("#repo-path2").val()
+           var repo_desc=$("#repo-desc2").val()
+            $.ajax({
+                    type: "post",
+                    url: "../api/repo/git",
+                    data: {
+                        repo_name:repo_name,repo_path:repo_path,repo_desc:repo_desc
+                    },
+                    beforeSend: function() {
+                        $("#import").addClass("disabled")
+                    },
+                    success: function(msg) {
+                        $('#gitModal').modal('hide');
+                        repo_list()    
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        $("#import").removeClass("disabled")
+                        new $.zui.Messager("导入失败", {
+                                type: 'danger' 
+                                }).show();
+                    }
+            }); 
+        }
+
         function create_repo(){
             var fd = new FormData();
             fd.append("repo_path",$('#repo-path')[0].files[0]);
@@ -130,13 +194,20 @@
         }
 
         function add(){
-            $("#repo-id").val("")
             $("#repo-name").val("")
             $("#repo-path").val("")
+            $("#repo-desc").val("")
             $("#upload").removeClass("disabled")
             $('#myModal').modal('show');
         }
         
+        function import_git(){
+            $("#repo-name2").val("")
+            $("#repo-path2").val("")
+            $("#repo-desc2").val("")
+            $("#import").removeClass("disabled")
+            $('#gitModal').modal('show');
+        }
 
         function delete_repo(repo_id){
            $.ajax({

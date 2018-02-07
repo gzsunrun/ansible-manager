@@ -30,6 +30,7 @@ func NewRouter(root *mux.Router) {
 	repoRoute.Handle("/get", apiHandler(project.GetRepositoryID))
 	repoRoute.Handle("/create", apiHandler(project.CreateRepository))
 	repoRoute.Handle("/delete", apiHandler(project.DeleteRepository))
+	repoRoute.Handle("/git", apiHandler(project.CloneGitRepo))
 	varsRoute := root.PathPrefix("/api/repo/vars").Subrouter()
 	varsRoute.Handle("", apiHandler(project.GetVars))
 	varsRoute.Handle("/get", apiHandler(project.GetVarsByID))
