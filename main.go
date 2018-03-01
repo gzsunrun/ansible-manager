@@ -1,18 +1,16 @@
 package main
 
 import (
-	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/astaxie/beego/logs"
-	"github.com/gorilla/mux"
-	"github.com/gzsunrun/ansible-manager/api/db"
-	"github.com/gzsunrun/ansible-manager/api/router"
-	"github.com/gzsunrun/ansible-manager/api/s3"
-	"github.com/gzsunrun/ansible-manager/api/sockets"
-	"github.com/gzsunrun/ansible-manager/api/tasks"
-	"github.com/gzsunrun/ansible-manager/config"
+	"github.com/gzsunrun/ansible-manager/core/config"
+	"github.com/gzsunrun/ansible-manager/core/sockets"
+	"github.com/gzsunrun/ansible-manager/core/function"
+	"github.com/gzsunrun/ansible-manager/core/orm"
+	"github.com/gzsunrun/ansible-manager/core/tasks"
+	_ "github.com/gzsunrun/ansible-manager/routers"
+	"github.com/astaxie/beego"
 )
 
 const (
@@ -23,17 +21,19 @@ const (
 )
 
 func run() {
-	os.MkdirAll(config.Cfg.AnsibleManager.WorkPath+"/repo", 0664)
-	s3.NewClient()
+	os.MkdirAll(config.Cfg.Ansible.WorkPath, 0664)
 	sockets.StartWS()
-	db.NewDB()
+	function.NewS3Client()
+	orm.NewDB()
 	go tasks.RunTask()
-	root := mux.NewRouter()
-	router.NewRouter(root)
-	err := http.ListenAndServe(":"+strconv.Itoa(config.Cfg.AnsibleManager.Port), root)
-	if err != nil {
-		logs.Error(err)
-	}
+	beego.BConfig.AppName = "sunruniaas-ansible"
+	beego.BConfig.RunMode = beego.PROD
+	beego.BConfig.CopyRequestBody = true
+	beego.BConfig.Log.FileLineNum = true
+	beego.SetLogFuncCall(true)
+	beego.SetStaticPath("/ui", "/root/go/src/github.com/gzsunrun/ansible-manager/public")
+	beego.BConfig.Listen.HTTPPort = config.Cfg.Ansible.Port
+	beego.Run()
 }
 
 func main() {

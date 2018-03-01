@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ansible Manager</title>
+    <!-- zui css -->
+    <link rel="stylesheet" href="dist/css/zui.min.css">
+    <link rel="stylesheet" href="dist/theme/blue.css">
+    <!-- app css -->
+    <link rel="stylesheet" href="css/app.css">
+    <!-- jquery js -->
+    <script src="dist/lib/jquery/jquery.js"></script>
+    <script src="dist/lib/jquery/jquery.cookie.js"></script>
+    
+</head>
+<body>
+    <div class="wrapper">
+        <div class="content-header">
+            <ul class="breadcrumb">
+                <li><a href="#"><i class="icon icon-home"></i></a></li>
+                <li class="active">仪表盘</li>
+            </ul>
+        </div>
+        <div class="content-body">
+            <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <div class="info-box bg-info">
+                                <div class="info-box-icon">
+                                    <i class="icon icon-tasks"></i>
+                                </div>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">任务总量</span>
+                                    <span class="info-box-number"><span id="total">--</span>
+                                        <small>个</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <div class="info-box bg-primary">
+                                <div class="info-box-icon">
+                                    <i class="icon icon-play"></i>
+                                </div>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">运行中任务</span>
+                                    <span class="info-box-number" ><span id="run-total">--</span>
+                                        <small>个</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <div class="info-box bg-success">
+                                <div class="info-box-icon">
+                                    <i class="icon icon-check-circle-o"></i>
+                                </div>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">成功任务</span>
+                                    <span class="info-box-number" ><span id="success-total">--</span>
+                                        <small>个</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <div class="info-box bg-danger">
+                                <div class="info-box-icon">
+                                    <i class="icon icon-remove-circle"></i>
+                                </div>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">失败任务</span>
+                                    <span class="info-box-number"><span id="error-total">--</span>
+                                        <small>个</small>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <div class="panel-title">产品信息</div>
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table table-info">
+                                        <tr>
+                                            <td>产品名称</td>
+                                            <td>Ansible Manager</td>
+                                        </tr>
+                                        <tr>
+                                            <td>开发语言</td>
+                                            <td>golang</td>
+                                        </tr>
+                                        <tr>
+                                            <td>开发作者</td>
+                                            <td>hashwing</td>
+                                        </tr>
+                                        <tr>
+                                            <td>联系方式</td>
+                                            <td>djh@gzsunrun.cn</td>
+                                        </tr>
+                                        <tr>
+                                            <td>源码地址</td>
+                                            <td><a target="_blank" href="https://github.com/gzsunrun/ansible-manager"><i class="icon icon-github"></i></a></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+        </div>
+    </div>
+    <!-- zui js -->
+    <script src="dist/js/zui.min.js"></script>
+    <!-- app js -->
+    <script src="js/app.js"></script>
+    <script src="js/data/main.js"></script>
+</body>
+</html>

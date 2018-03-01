@@ -1,151 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-    <link type="text/css" href="zui/css/zui.min.css" rel="stylesheet">
-    <style>
-        .body-head{
-            text-align: right;
-            margin-bottom: 50px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ansible Manager</title>
+    <!-- zui css -->
+    <link rel="stylesheet" href="dist/css/zui.min.css">
+    <link rel="stylesheet" href="dist/theme/blue.css">
+    <!-- app css -->
+    <link rel="stylesheet" href="css/app.css">
+    <!-- jquery js -->
+    <script src="dist/lib/jquery/jquery.js"></script>
+    <script src="dist/lib/jquery/jquery.cookie.js"></script>
 </head>
+
 <body>
-    <div class="body-head">
-                <button  type="button" class="btn btn-success" onclick="add()">创建用户</button>
-    </div>
-    <!-- 对话框HTML -->
-    <div class="modal fade" id="myModal">
-            <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
-                        <h4 class="modal-title">用户</h4>
-                      </div>
-                      <div class="modal-body">
-                            <form class="form-horizontal">
-                                    <input type="hidden"  id="user-id" value="">
-                                    <div class="form-group">
-                                      <label for="exampleInputAccount4" class="col-sm-2">账号</label>
-                                      <div class="col-md-6 col-sm-10">
-                                        <input type="text" class="form-control" id="user-account" placeholder="账号">
-                                      </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="exampleInputAccount4" class="col-sm-2">密码</label>
-                                        <div class="col-md-6 col-sm-10">
-                                          <input type="text" class="form-control" id="user-password" placeholder="密码">
-                                        </div>
-                                      </div>
-                             </form>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        <button type="button" onclick="create_user()" class="btn btn-primary">提交</button>
-                      </div>
+    <div class="wrapper">
+        <div class="content-header">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">
+                        <i class="icon icon-home"></i>
+                    </a>
+                </li>
+                <li class="active">用户列表</li>
+            </ul>
+        </div>
+        <div class="content-body">
+            <div class="container-fluid">
+                <div class="table-tools" style="margin: 25px 15px;">
+                    <div class="tools-group">
+                        <a href="#" id="user-add" class="btn btn-primary" data-toggle="modal" data-target="#user-modal">
+                            <i class="icon icon-plus-sign"></i> 新增</a>
                     </div>
-                  </div> 
+                </div>
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div class="panel-title">用户列表</div>
+                    </div>
+                    <div class="panel-body">
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>账号</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-list">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="user-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">×</span>
+                            <span class="sr-only">关闭</span>
+                        </button>
+                        <h4 class="modal-title">用户</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal">
+                            <input type="hidden" id="user-id" value="">
+                            <div class="form-group">
+                                <label for="user-account" class="col-sm-2">账号</label>
+                                <div class="col-md-9 col-sm-10">
+                                    <input type="text" class="form-control" id="user-account" placeholder="账号">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="user-password" class="col-sm-2">密码</label>
+                                <div class="col-md-9 col-sm-10">
+                                    <input type="password" class="form-control" id="user-password" placeholder="密码">
+                                </div>
+                            </div>
+                            
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" id="user-commit" class="btn btn-primary">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  <table class="table">
-  <tbody id="user-list">
-  </tbody>
-
-</table>
+    <!-- zui js -->
+    <script src="dist/js/zui.min.js"></script>
+    <!-- app js -->
+    <script src="js/app.js"></script>
+    <script src="js/data/user.js"></script>
 </body>
-<script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
-<script type="text/javascript" src="zui/js/zui.min.js"></script>
-<script>
-    user_list()
-    
-        function user_list(){
-            $("#user-list").empty();
-            $.ajax({
-                    type: "post",
-                    url: "../api/user",
-                    data: {
-                    },
-                    beforeSend: function() {},
-                    success: function(msg) {
-                            var obj = JSON.parse(msg);
-                            $.each(obj, function(i, val) {
-                                    $("#user-list").append(`<tr>
-                                    <td>`+val.user_account+`</td>
-                                    <td style="text-align:right;">
-                                            <button onclick="edit_project(`+val.user_id+`)" class="btn btn-sm" type="button">
-                                                <i class="icon icon-edit"></i>
-                                            </button>
-                                    </td>
-                                    </tr>`);
-                            });     
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        $("#user-list").append("<tr><td colspan='6'>没加载到数据</td></tr>");
-                    }
-            });
-        }
 
-        function add(){
-            $("#user-account").val("")
-            $("#user-id").val("")
-            $("#user-password").val("")
-            $('#myModal').modal('show');
-        }
-
-        function create_user(){
-           var user_account= $("#user-account").val()
-           var user_id= $("#user-id").val()
-           var user_password=$("#user-password").val()
-           if (user_account==""||user_password==""){
-               alert("参数错误")
-               return
-           }
-           var url
-           if (user_id=="")
-                url="../api/user/create"
-            else
-                url="../api/user/update"
-           $.ajax({
-                    type: "post",
-                    url: url,
-                    data: {
-                        user_account:user_account,
-                        user_password:user_password,
-                        user_id:user_id
-                    },
-                    beforeSend: function() {},
-                    success: function(msg) {
-                            $("#user-password").val("")
-                            $('#myModal').modal('hide');
-                            user_list() 
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        new $.zui.Messager("操作失败", {
-                                type: 'danger' 
-                                }).show();
-                    }
-            });
-        }
-
-        function edit_project(user_id){
-            $.ajax({
-                    type: "post",
-                    url: "../api/user/get",
-                    data: {
-                        user_id:user_id
-                    },
-                    beforeSend: function() {},
-                    success: function(msg) {
-                        var obj = JSON.parse(msg);
-                        $("#user-id").val(obj.user_id)
-                        $("#user-account").val(obj.user_account)
-                        $('#myModal').modal('show');
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {}
-            });
-        }
-        
-</script>
 </html>

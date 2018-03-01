@@ -1,126 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-    <link type="text/css" href="zui/css/zui.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ansible Manager</title>
+    <!-- zui css -->
+    <link rel="stylesheet" href="dist/css/zui.min.css">
+    <link rel="stylesheet" href="dist/lib/board/zui.board.min.css">
+    <link rel="stylesheet" href="dist/theme/blue.css">
+    <!-- app css -->
+    <link rel="stylesheet" href="css/app.css">
     <style>
-        .body-head{
-            text-align: right;
-            margin-bottom: 50px;
+        .board-item.drag-shadow {
+            z-index: 9999
         }
     </style>
+    <!-- jquery js -->
+    <script src="dist/lib/jquery/jquery.js"></script>
+    <script src="dist/lib/jquery/jquery.cookie.js"></script>
 </head>
+
 <body>
-  <table class="table">
-      <thead>
-          <tr>
-            <th>ID</th>
-            <th>Task_Name</th>
-            <th>Task_Status</th>
-            <th style="text-align:right;">Options</th>
-          </tr>
-        </thead>
-  <tbody id="task-list">
-  </tbody>
+    <div class="wrapper">
+        <div class="content-header">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">
+                        <i class="icon icon-home"></i>
+                    </a>
+                </li>
+                <li class="active">任务管理</li>
+            </ul>
+        </div>
+        <div class="content-body">
+            <div class="container-fluid">
+                <div class="table-tools" style="margin: 25px 15px;">
+                    <div class="tools-group">
+                        <a href="#" id="task-add" class="btn btn-primary" data-toggle="modal" data-target="#task-modal">
+                            <i class="icon icon-plus-sign"></i> 新增</a>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div class="panel-title">任务列表</div>
+                    </div>
+                    <div class="panel-body">
 
-</table>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>任务名称</th>
+                                    <th>任务状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="task-list">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 对话框HTML -->
+        <div class="modal fade" id="task-modal">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">×</span>
+                            <span class="sr-only">关闭</span>
+                        </button>
+                        <h4 class="modal-title">任务</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal">
+                            <input type="hidden" id="task-id" value="">
+                            <div class="form-group">
+                                <label for="task-name" class="col-sm-2">任务名</label>
+                                <div class="col-md-9 col-sm-10">
+                                    <input type="text" class="form-control" id="task-name" placeholder="模板名">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="repo-id" class="col-sm-2">脚本</label>
+                                <div class="col-md-9 col-sm-10">
+                                    <select class="form-control" id="repo-id">
+                                        <option value="">请选择脚本</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="playbook" class="col-sm-2">角色</label>
+                                <div class="col-md-9 col-sm-10">
+                                    <span class="inv"></span>
+                                </div>
+                            </div>
+                            <span id="playbook-parse"></span>
+                            <a href="javascript:CreateTask();" id="task-create" class="btn btn-primary pull-right disabled">提交</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="run-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">×</span>
+                            <span class="sr-only">关闭</span>
+                        </button>
+                        <h4 class="modal-title">启动任务</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal">
+                                <input type="hidden" id="run-name" value="">
+                                <input type="hidden" id="run-id" value="">
+                            <div class="form-group">
+                                <label for="tag-id" class="col-sm-2">tag</label>
+                                <div class="col-md-6 col-sm-10">
+                                    <select class="form-control" id="task-tag">
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" id="start-task" onclick="StartTask()" class="btn btn-primary">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- zui js -->
+    <script src="dist/js/zui.min.js"></script>
+    <script src="dist/lib/board/zui.board.min.js"></script>
+    <!-- app js -->
+    <script src="js/app.js"></script>
+    <script src="js/data/task.js"></script>
 </body>
-<script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
-<script type="text/javascript" src="zui/js/zui.min.js"></script>
-<script>
-    task_list()
-        function task_list(){
-            $("#task-list").empty();
-            $.ajax({
-                    type: "post",
-                    url: "../api/project/task",
-                    data: {
-                    },
-                    beforeSend: function() {},
-                    success: function(msg) {
-                       var obj= JSON.parse(msg)
-                            $.each(obj, function(i, val) {
-                                var stopBtn="disabled"
-                                    if (val.task_status=="running"){
-                                        stopBtn=""
-                                    }
-                                    $("#task-list").append(`<tr>
-                                    <td>`+val.task_id+`</td>
-                                    <td>`+val.task_name+`</td>
-                                    <td>`+val.task_status+`</td>
-                                    <td style="text-align:right;">
-                                            <button onclick="view_task(`+val.task_id+`,'`+val.task_name+`')" class="btn btn-sm" type="button">
-                                                <i class="icon icon-eye-open"></i>
-                                            </button>
-                                            <button onclick="stop_task(`+val.task_id+`)" `+stopBtn+` class="btn btn-sm" type="button">
-                                                <i class="icon icon-stop"></i>
-                                            </button>
-                                            <button onclick="delete_task(`+val.task_id+`)" class="btn btn-sm btn-danger" type="button">
-                                                <i class="icon icon-trash"></i>
-                                            </button>
-                                    </td>
-                                    </tr>`);
-                            });        
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        $("#task-list").append("<tr><td colspan='6'>没加载到数据</td></tr>");
-                    }
-            });
-        }
 
-       
-       function view_task(task_id,task_name){
-        var taskModalTrigger = new $.zui.ModalTrigger({
-                              title:"任务："+task_name,
-                              size:"fullscreen",
-                              iframe:"home.html?task_id="+task_id
-                              });
-                            taskModalTrigger.show();
-       }
-
-
-        function delete_task(task_id){
-           $.ajax({
-                    type: "post",
-                    url: "../api/project/task/delete",
-                    data: {
-                      task_id:task_id
-                    },
-                    beforeSend: function() {},
-                    success: function(msg) {
-                        task_list()    
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        new $.zui.Messager(obj.data, {
-                                type: 'danger' 
-                                }).show();
-                    }
-            });
-        }
-
-        function stop_task(task_id){
-           $.ajax({
-                    type: "post",
-                    url: "../api/project/task/stop",
-                    data: {
-                      task_id:task_id
-                    },
-                    beforeSend: function() {},
-                    success: function(msg) {
-                        new $.zui.Messager("请求已提交", {
-                                type: 'success' 
-                                }).show();  
-                                task_list()  
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        new $.zui.Messager(obj.data, {
-                                type: 'danger' 
-                                }).show();
-                    }
-            });
-        }
-</script>
 </html>
