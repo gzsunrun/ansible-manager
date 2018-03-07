@@ -37,8 +37,8 @@ $("#task-add").click(function(){
 function GetHostList(){
     AjaxReq(
         "get",
-        "../ansible/common/hosts",
-        {},
+        "../ansible/common/project/hosts",
+        {project_id:project_id},
         function () { },
         function(msg){
             HOSTS=msg

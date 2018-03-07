@@ -1,6 +1,7 @@
 
 $(function(){
     GetHostList()
+    GetHostStatus()
 })
 
 $("#host-commit").click(function(){
@@ -13,6 +14,36 @@ $("#host-add").click(function(){
 
 // get host list
 function GetHostList() {
+    $("#host-list").html(`<tr><td colspan=6><i class="icon icon-spin icon-spinner-indicator icon-3x"></i></td></tr>`)
+    var success = function (msg) {
+        $("#host-list").empty()
+        $.each(msg, function (i, val) {
+            var html = `<tr>
+            <td>`+ val.host_id + `</td>
+            <td>`+ val.host_alias + `</td>
+            <td>`+ val.host_ip + `</td>
+            <td><i class="icon icon-spin icon-spinner-indicator"></i></td>
+            <td>`+ val.created + `</td>
+            <td>
+                <a href="javascript:GetHost('`+val.host_id+`');" class="btn btn-xs btn-primary">编辑</a>
+                <a href="javascript:DelHost('`+val.host_id+`');" class="btn btn-xs btn-danger">删除</a>
+            </td>
+        </tr>`
+            $('#host-list').append(html)
+        })
+    };
+
+    AjaxReq(
+        "get",
+        "../ansible/common/hosts",
+        {},
+        function () { },
+        success,
+        ReqErr
+    );
+}
+
+function GetHostStatus() {
     $("#host-list").html(`<tr><td colspan=6><i class="icon icon-spin icon-spinner-indicator icon-3x"></i></td></tr>`)
     var success = function (msg) {
         $("#host-list").empty()
@@ -39,7 +70,7 @@ function GetHostList() {
 
     AjaxReq(
         "get",
-        "../ansible/common/hosts",
+        "../ansible/common/hosts_status",
         {},
         function () { },
         success,

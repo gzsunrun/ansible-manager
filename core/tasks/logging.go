@@ -7,14 +7,17 @@ import (
 
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/sockets"
+	"github.com/gzsunrun/ansible-manager/core/output"
 	log "github.com/astaxie/beego/logs"
 )
 
 type Task struct {
-	Desc   orm.Task
+	Desc   	orm.Task
+	LO 		output.LogOutput
 }
 
 func (t *Task) log(msg string) {
+	t.LO.Write(msg)
 	b, err := json.Marshal(&map[string]interface{}{
 		"type":    "log",
 		"output":  msg,
@@ -25,7 +28,6 @@ func (t *Task) log(msg string) {
 		log.Error(err)
 		return
 	}
-	log.Info(msg)
 	sockets.Message(t.Desc.ID, b)
 }
 
@@ -61,3 +63,4 @@ func (t *Task) logCmd(cmd *exec.Cmd) {
 	go t.logPipe(bufio.NewScanner(stderr))
 	go t.logPipe(bufio.NewScanner(stdout))
 }
+

@@ -2,12 +2,11 @@ package controllers
 
 import (
 	"os"
-	"strconv"
-	"time"
 
 	log "github.com/astaxie/beego/logs"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/function"
+	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/satori/go.uuid"
 )
@@ -33,14 +32,14 @@ func (c *RepoController) Create() {
 	repo.Name=c.GetString("repo_name")
 	repo.Desc=c.GetString("repo_desc")
 	repo.ID= uuid.NewV4().String()
-	f, h, err := c.GetFile("repo_path")
+	f, _, err := c.GetFile("repo_path")
 	if err != nil {
 		log.Error("Getfile",err)
 		c.SetResult(err, nil, 400)
 		return
 	}
 	f.Close()
-	repoPath := strconv.FormatInt(time.Now().UnixNano(), 10)
+	repoPath := uuid.NewV4().String()
 	repo.Path = repoPath
 	err = c.SaveToFile("repo_path", config.Cfg.Ansible.WorkPath+"/"+repoPath)
 	if err != nil {
@@ -55,30 +54,23 @@ func (c *RepoController) Create() {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	icof, err := os.Open(config.Cfg.Ansible.WorkPath + "/" + repoPath + "_dir/logo.png")
-	if err != nil {
-		log.Error(err)
-		c.SetResult(err, nil, 400)
-		return
+	_, err = os.Stat(config.Cfg.Ansible.WorkPath + "/" + repoPath + "_dir/logo.png")
+	if err == nil || os.IsExist(err) {
+		logoParse:=storage.StorageParse{
+			LocalPath:config.Cfg.Ansible.WorkPath + "/" + repoPath + "_dir/logo.png",
+			RemotePath:repoPath+".png",
+		}
+		err = storage.Storage.Put(&logoParse)
+		if err != nil {
+			c.SetResult(err, nil, 400)
+			return
+		}
 	}
-	defer icof.Close()
-	fileStat, err := icof.Stat()
-	if err != nil {
-		c.SetResult(err, nil, 400)
-		return
+	repoParse:=storage.StorageParse{
+		LocalPath:config.Cfg.Ansible.WorkPath + "/" + repoPath,
+		RemotePath:repoPath,
 	}
-	err = function.S3Put(icof, fileStat.Size(), repoPath+".png")
-	if err != nil {
-		c.SetResult(err, nil, 400)
-		return
-	}
-	rf, err := os.Open(config.Cfg.Ansible.WorkPath + "/" + repoPath)
-	if err != nil {
-		c.SetResult(err, nil, 400)
-		return
-	}
-	defer rf.Close()
-	err = function.S3Put(rf, h.Size, repoPath)
+	err = storage.Storage.Put(&repoParse)
 	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
@@ -104,8 +96,14 @@ func (c *RepoController) Delete() {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	function.S3Delte(repo.Path)
-	function.S3Delte(repo.Path + ".png")
+	logoParse:=storage.StorageParse{
+		RemotePath:repo.Path+".png",
+	}
+	repoParse:=storage.StorageParse{
+		RemotePath:repo.Path,
+	}
+	storage.Storage.Delete(&logoParse)
+	storage.Storage.Delete(&repoParse)
 	c.SetResult(nil, nil, 204)
 }
 

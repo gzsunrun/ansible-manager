@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/sockets"
-	"github.com/gzsunrun/ansible-manager/core/function"
+	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/tasks"
 	_ "github.com/gzsunrun/ansible-manager/routers"
@@ -21,9 +21,19 @@ const (
 )
 
 func run() {
+	config.SetLog(LOG_PATH)
+	err := config.NewConfig(CONFIG_PATH)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
 	os.MkdirAll(config.Cfg.Ansible.WorkPath, 0664)
 	sockets.StartWS()
-	function.NewS3Client()
+	//function.NewS3Client()
+	err=storage.SetStorage()
+	if err != nil {
+		return
+	}
 	orm.NewDB()
 	go tasks.RunTask()
 	beego.BConfig.AppName = "sunruniaas-ansible"
@@ -37,15 +47,5 @@ func run() {
 }
 
 func main() {
-	err := logs.SetLogger(logs.AdapterMultiFile, `{"filename":"`+LOG_PATH+`","separate":["error"]}`)
-	if err != nil {
-		logs.Error("fail to config logrus")
-		return
-	}
-	err = config.NewConfig(CONFIG_PATH)
-	if err != nil {
-		logs.Error(err)
-		return
-	}
 	config.BackGroundService(SERVICE_NAME, SERVICE_DESC, nil, run)
 }

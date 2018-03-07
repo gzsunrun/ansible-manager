@@ -49,7 +49,7 @@ CREATE TABLE `ansible_project_host` (
   PRIMARY KEY (`id`),
   FOREIGN KEY (`project_id`) REFERENCES `ansible_project` (`project_id`) ON DELETE CASCADE,
   FOREIGN KEY (`host_id`) REFERENCES `ansible_host` (`host_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `ansible_task`;
@@ -80,4 +80,4 @@ CREATE TABLE `ansible_user` (
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-INSERT INTO `ansible_user` (user_account,user_password) VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e');
+INSERT INTO `ansible_user` (user_id,user_account,user_password) VALUES ('2f8e409a-774c-440e-a281-3e21ef6467e0','admin', 'e10adc3949ba59abbe56e057f20f883e');

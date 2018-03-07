@@ -2,6 +2,7 @@ package auth
 
 import (
 	"time"
+	"fmt"
 
 	"github.com/astaxie/beego/context"
 	"github.com/dgrijalva/jwt-go"
@@ -61,6 +62,7 @@ func JwtAuthFilter(ctx *context.Context) {
 			return []byte(APIAUTH_SECRET_KEY), nil
 		})
 	if err != nil || token.Claims.(*AnsibleJwtClaims).Uid == "" {
+		fmt.Println(err)
 		ctx.Output.Status = 401
 		ctx.Output.JSON(err, false, false)
 		return

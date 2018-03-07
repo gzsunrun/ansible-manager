@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"strconv"
 	"fmt"
 	"html/template"
 	"encoding/json"
@@ -12,6 +13,8 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/function"
+	"github.com/gzsunrun/ansible-manager/core/output"
+	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/sockets"
 	log "github.com/astaxie/beego/logs"
 )
@@ -57,9 +60,13 @@ func newTask(taskID string) error {
 		log.Error(err)
 		return err
 	}
-	newTask := &Task{
-		Desc: task,
+	lo,err:=output.NewLogOutput(taskID)
+	if err!=nil{
+		log.Error(err)
 	}
+	newTask:=new(Task)
+	newTask.Desc=task
+	newTask.LO=lo
 	time.Sleep(time.Second * 2)
 	defer func() {
 		newTask.Desc.End = time.Now()
@@ -139,7 +146,11 @@ func (t *Task) downloadRepository() error {
 		return err
 	}
 	log.Info(t.Desc.RepoID,repo.Path)
-	err = function.S3Get(repo.Path, workPath+"/repo-tar-"+t.Desc.ID)
+	repoParse :=storage.StorageParse{
+		LocalPath:workPath+"/repo-tar-"+t.Desc.ID,
+		RemotePath:repo.Path,
+	}
+	err = storage.Storage.Get(&repoParse)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -173,6 +184,7 @@ func (t *Task) clcRepo() error {
 	return nil
 }
 
+
 type PlaybookParse struct {
 	Hosts []orm.Hosts `json:"hosts"`
 	Group []orm.Group `json:"group"`
@@ -197,18 +209,26 @@ func (t *Task) installVars() error {
 			}
 		}
 	}
-	playbookParse:=PlaybookParse{
-		Hosts:hosts,
-		Group:t.Desc.Group,
-		Vars:t.Desc.Vars,
-	}
-	for _, val := range hosts {
+	for i, val := range hosts {
+		if val.Key!=""&&val.Password!=""{
+			if function.AuthKeyByHost(val)!="success"{
+				hosts[i].Key=""
+			}
+		}
+		if val.HostName==""{
+			hosts[i].HostName="host"+strconv.Itoa(i)
+		}
 		if val.Key != "" {
 			if err := ioutil.WriteFile(workPath+"/repo_"+t.Desc.ID+"/key-"+val.IP, []byte(val.Key), 0600); err != nil {
 				log.Error(err)
 				return err
 			}
 		}
+	}
+	playbookParse:=PlaybookParse{
+		Hosts:hosts,
+		Group:t.Desc.Group,
+		Vars:t.Desc.Vars,
 	}
 
 	for _, val := range t.Desc.Vars {

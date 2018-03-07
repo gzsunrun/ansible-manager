@@ -1,0 +1,92 @@
+package storage
+
+import (
+	"net/url"
+	"time"
+	"strings"
+	"net"
+
+	log "github.com/astaxie/beego/logs"
+	"github.com/minio/minio-go"
+)
+
+type S3Storage struct {
+	URL    string
+	Key    string
+	Secret string
+	Bucket string
+}
+
+func NewS3Storage(url,key,secret,bucket string)(*S3Storage,error) {
+	s3:=new(S3Storage)
+	s3.URL = url
+	s3.Key = key
+	s3.Secret = secret
+	s3.Bucket = bucket
+	return s3,nil
+}
+
+func (s3 *S3Storage)Put(repo *StorageParse) error {
+	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	_, err=s3Client.FPutObject(s3.Bucket,repo.RemotePath,repo.LocalPath,minio.PutObjectOptions{})
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	return nil
+}
+
+func (s3 *S3Storage)Get(repo *StorageParse) error {
+	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	err = s3Client.FGetObject(s3.Bucket, repo.RemotePath, repo.LocalPath, minio.GetObjectOptions{})
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	return nil
+}
+
+func (s3 *S3Storage)Delete(repo *StorageParse) error {
+	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	err = s3Client.RemoveObject(s3.Bucket, repo.RemotePath)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	return nil
+}
+
+func (s3 *S3Storage)Share(repo *StorageParse) (string, error) {
+	addrs:=strings.Split(s3.URL,":")
+	ns, err := net.LookupHost(addrs[0])
+	if err!=nil{
+		return "",err
+	}
+	s3Client, err := minio.NewV2(ns[0]+":"+addrs[1], s3.Key, s3.Secret, false)
+	if err != nil {
+		log.Error(err)
+		return "", err
+	}
+	reqParams := make(url.Values)
+	reqParams.Set("response-content-disposition", "attachment;filename=\""+repo.RemotePath+"\"")
+
+	presignedURL, err := s3Client.PresignedGetObject(s3.Bucket, repo.RemotePath, time.Second*60*10, reqParams)
+	if err != nil {
+		log.Error(err)
+		return "", err
+	}
+	return presignedURL.String(), nil
+}

@@ -29,7 +29,8 @@ func init() {
 		beego.NSRouter("/repo/create", &controllers.RepoController{}, "post:Create"),
 		beego.NSRouter("/repo/delete", &controllers.RepoController{}, "get:Delete"),
 		beego.NSRouter("/vars", &controllers.RepoController{}, "get:Vars"),
-		beego.NSRouter("/hosts", &controllers.HostController{}, "get:List"),
+		beego.NSRouter("/hosts", &controllers.HostController{}, "get:ListNO"),
+		beego.NSRouter("/hosts_status", &controllers.HostController{}, "get:List"),
 		beego.NSRouter("/hosts/create", &controllers.HostController{}, "post:Create"),
 		beego.NSRouter("/hosts/get", &controllers.HostController{}, "get:Get"),
 		beego.NSRouter("/hosts/del", &controllers.HostController{}, "get:Del"),
@@ -51,22 +52,9 @@ func init() {
 		beego.NSRouter("/task/count", &controllers.TaskController{}, "get:GetTaskCount"),
 	)
 
-	iaasApi := beego.NewNamespace("/api/ansible",
-		beego.NSRouter("/repo", &controllers.RepoController{}, "get:List"),
-		beego.NSRouter("/repo/create", &controllers.RepoController{}, "post:Create"),
-		beego.NSRouter("/repo/delete", &controllers.RepoController{}, "get:Delete"),
-		beego.NSRouter("/vars", &controllers.IaaSController{}, "get:RepoVars"),
-		beego.NSRouter("/host", &controllers.IaaSController{}, "get:ProjectHosts"),
-		beego.NSRouter("/host/update", &controllers.IaaSController{}, "post:CreateHost"),
-		beego.NSRouter("/task/create", &controllers.IaaSController{}, "post:CreateTask"),
-		beego.NSRouter("/task/history", &controllers.IaaSController{}, "get:GetTask"),
-		beego.NSRouter("/task/stop", &controllers.IaaSController{}, "get:Stop"),
-		beego.NSRouter("/task/notes", &controllers.TaskController{}, "get:GetNotes"),
-	)
 
-	beego.AddNamespace(authApi,iaasApi,commonApi)
+	beego.AddNamespace(authApi,commonApi)
 	beego.InsertFilter("/ansible/common/*", beego.BeforeRouter, auth.JwtAuthFilter)
-	beego.InsertFilter("/api/ansible/*", beego.BeforeRouter, auth.IaaSAuthFilter)
 
 	beego.Handler("/api/ansible/ws", socketHandler(sockets.Handler))
 }

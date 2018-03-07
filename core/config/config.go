@@ -35,6 +35,10 @@ func NewConfig(file string) error {
 	return err
 }
 
+func SetConfig(c *Config){
+	Cfg=c
+}
+
 func LoadConfig(file string, settings interface{}) error {
 
 	if file != "" {

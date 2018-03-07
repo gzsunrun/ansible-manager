@@ -13,29 +13,65 @@ import (
 
 func SshDail(host orm.HostsList)string{
 	if host.Password!=""{
-		c, err := ssh.Dial("tcp", host.IP+":22", &ssh.ClientConfig{
-			User: host.User,
-			Auth: []ssh.AuthMethod{ssh.Password("sunrunvas")},
-			Timeout:3*time.Second,
-		})
-		
-		if err!=nil{
-			if strings.Contains(err.Error(),"unable to authenticate"){
-				return "auth"
+		res:=AuthPassword(host)
+		if res!="success"{
+			if host.Key!=""{
+				return AuthKey(host)
 			}
-			return "fail"
 		}
-		defer c.Close()
-		return "success"
+		return res
 	}
 	if host.Key!=""{
-		signer,err:=ssh.ParsePrivateKey([]byte(host.Key))
+		return AuthKey(host)
+	}
+	return "fail"
+} 
+
+func AuthPassword(host orm.HostsList)string{
+	authMethods := []ssh.AuthMethod{}
+
+    keyboardInteractiveChallenge := func(
+        user,
+        instruction string,
+        questions []string,
+        echos []bool,
+    ) (answers []string, err error) {
+        if len(questions) == 0 {
+            return []string{}, nil
+        }
+        return []string{host.Password}, nil
+    }
+	
+	authMethods = append(authMethods, ssh.KeyboardInteractive(keyboardInteractiveChallenge))
+    authMethods = append(authMethods, ssh.Password(host.Password))
+
+	c, err := ssh.Dial("tcp", host.IP+":22", &ssh.ClientConfig{
+		User: host.User,
+		Auth: authMethods,
+		Timeout:3*time.Second,
+	})
+	
+	if err!=nil{
+		if strings.Contains(err.Error(),"unable to authenticate"){
+			return "auth"
+		}
+		return "fail"
+	}
+	defer c.Close()
+	return "success"
+}
+
+func AuthKey(host orm.HostsList)string{
+	signer,err:=ssh.ParsePrivateKey([]byte(host.Key))
 		if err!=nil{
 			log.Error(err)
 			return "fail"
 		}
+		if host.User==""{
+			host.User="root"
+		}
 		c, err := ssh.Dial("tcp", host.IP+":22", &ssh.ClientConfig{
-			User: "root",
+			User: host.User,
 			Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
 			Timeout:3*time.Second,
 		})
@@ -48,6 +84,26 @@ func SshDail(host orm.HostsList)string{
 		}
 		defer c.Close()
 		return "success"
-	}
-	return "fail"
-} 
+}
+
+func AuthKeyByHost(host orm.Hosts)string{
+	signer,err:=ssh.ParsePrivateKey([]byte(host.Key))
+		if err!=nil{
+			log.Error(err)
+			return "fail"
+		}
+		c, err := ssh.Dial("tcp", host.IP+":22", &ssh.ClientConfig{
+			User: host.User,
+			Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+			Timeout:3*time.Second,
+		})
+		
+		if err!=nil{
+			if strings.Contains(err.Error(),"unable to authenticate"){
+				return "auth"
+			}
+			return "fail"
+		}
+		defer c.Close()
+		return "success"
+}

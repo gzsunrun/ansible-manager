@@ -41,6 +41,17 @@ func (c *HostController)List(){
 	wg.Wait()
 	c.SetResult(nil,hosts,200)
 }
+func (c *HostController)ListNO(){
+	defer c.ServeJSON()
+	uid:=c.GetUid()
+	var hosts []orm.HostsList
+	err:=orm.FindHosts(uid,&hosts)
+	if err!=nil{
+		c.SetResult(err,nil,400)
+		return
+	}
+	c.SetResult(nil,hosts,200)
+}
 
 func (c *HostController)Get(){
 	defer c.ServeJSON()
@@ -63,11 +74,7 @@ func (c *HostController)Create(){
 	}
 	if host.ID !=""{
 		var err error
-		if host.Password!=""||host.Key!=""{
-			err=orm.UPdateNullHost(&host)
-		}else{
-			err=orm.UPdateHost(&host)
-		}
+		err=orm.UPdateHost(&host)
 		if err != nil {
 			c.SetResult(err, nil, 400)
 			return

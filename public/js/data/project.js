@@ -22,7 +22,7 @@ function GetProjectList() {
             <td>`+ val.project_name + `</td>
             <td>`+ val.created + `</td>
             <td>
-                <a href="task.html?project_id=`+val.project_id+`" class="btn btn-xs btn-success">创建任务</a>
+                <a href="task.html?project_id=`+val.project_id+`" class="btn btn-xs btn-success">任务管理</a>
                 <a href="javascript:GetProject('`+val.project_id+`');" class="btn btn-xs btn-primary">编辑</a>
                 <a href="javascript:DelProject('`+val.project_id+`');" class="btn btn-xs btn-danger">删除</a>
             </td>
