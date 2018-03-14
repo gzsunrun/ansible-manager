@@ -104,6 +104,7 @@ func FindTasks(pid string,task interface{})error{
 	return nil
 }
 
+
 func DelTask(tid string)error{
 	task:=new(Task)
 	_,err:=MysqlDB.Table("ansible_task").Where("task_id=?",tid).Delete(task)

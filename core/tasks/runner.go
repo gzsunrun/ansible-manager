@@ -13,6 +13,7 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/function"
+	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/output"
 	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/sockets"
@@ -28,7 +29,7 @@ func AddTask(taskID string) {
 }
 
 func RunTask() {
-	workPath = config.Cfg.Ansible.WorkPath
+	workPath = config.Cfg.Common.WorkPath
 	taskList = make(chan string)
 	taskChan := make(chan bool, 5)
 	go cmdst.Run()
@@ -39,6 +40,7 @@ func RunTask() {
 				taskChan <- true
 				defer func() {
 					<-taskChan
+					kv.DefaultClient.DeleteTask(id)
 				}()
 				newTask(id)
 			}()
@@ -102,10 +104,13 @@ func newTask(taskID string) error {
 		newTask.Desc.Status = "error"
 		if err.Error() == "signal: killed" {
 			newTask.Desc.Status = "stop"
+			log.Info("stop task:",newTask.Desc.ID)
+			return nil
 		}
 		return err
 	}
 	newTask.Desc.Status = "finish"
+	log.Info("finish task:",newTask.Desc.ID)
 	return nil
 }
 
@@ -145,7 +150,7 @@ func (t *Task) downloadRepository() error {
 		log.Error(err)
 		return err
 	}
-	log.Info(t.Desc.RepoID,repo.Path)
+
 	repoParse :=storage.StorageParse{
 		LocalPath:workPath+"/repo-tar-"+t.Desc.ID,
 		RemotePath:repo.Path,
@@ -186,13 +191,13 @@ func (t *Task) clcRepo() error {
 
 
 type PlaybookParse struct {
-	Hosts []orm.Hosts `json:"hosts"`
+	Hosts []orm.HostsList `json:"hosts"`
 	Group []orm.Group `json:"group"`
 	Vars  []orm.Vars  `json:"vars"`
 }
 
 func (t *Task) installVars() error {
-	var hosts []orm.Hosts
+	var hosts []orm.HostsList
 	err:=orm.FindHostFromProject(t.Desc.ProjectID,&hosts)
 	if err!=nil{
 		log.Error(err)
@@ -211,7 +216,7 @@ func (t *Task) installVars() error {
 	}
 	for i, val := range hosts {
 		if val.Key!=""&&val.Password!=""{
-			if function.AuthKeyByHost(val)!="success"{
+			if function.AuthKey(val)!="success"{
 				hosts[i].Key=""
 			}
 		}

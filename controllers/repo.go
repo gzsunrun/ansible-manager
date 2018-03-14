@@ -41,23 +41,23 @@ func (c *RepoController) Create() {
 	f.Close()
 	repoPath := uuid.NewV4().String()
 	repo.Path = repoPath
-	err = c.SaveToFile("repo_path", config.Cfg.Ansible.WorkPath+"/"+repoPath)
+	err = c.SaveToFile("repo_path", config.Cfg.Common.WorkPath+"/"+repoPath)
 	if err != nil {
 		log.Error(err)
 		c.SetResult(err, nil, 400)
 		return
 	}
-	defer os.Remove(config.Cfg.Ansible.WorkPath + "/" + repoPath)
-	defer os.RemoveAll(config.Cfg.Ansible.WorkPath + "/" + repoPath + "_dir")
-	err = function.ReadVars(config.Cfg.Ansible.WorkPath + "/" + repoPath,&repo)
+	defer os.Remove(config.Cfg.Common.WorkPath + "/" + repoPath)
+	defer os.RemoveAll(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir")
+	err = function.ReadVars(config.Cfg.Common.WorkPath + "/" + repoPath,&repo)
 	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	_, err = os.Stat(config.Cfg.Ansible.WorkPath + "/" + repoPath + "_dir/logo.png")
+	_, err = os.Stat(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo.png")
 	if err == nil || os.IsExist(err) {
 		logoParse:=storage.StorageParse{
-			LocalPath:config.Cfg.Ansible.WorkPath + "/" + repoPath + "_dir/logo.png",
+			LocalPath:config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo.png",
 			RemotePath:repoPath+".png",
 		}
 		err = storage.Storage.Put(&logoParse)
@@ -67,7 +67,7 @@ func (c *RepoController) Create() {
 		}
 	}
 	repoParse:=storage.StorageParse{
-		LocalPath:config.Cfg.Ansible.WorkPath + "/" + repoPath,
+		LocalPath:config.Cfg.Common.WorkPath + "/" + repoPath,
 		RemotePath:repoPath,
 	}
 	err = storage.Storage.Put(&repoParse)

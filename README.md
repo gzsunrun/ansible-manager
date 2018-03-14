@@ -9,6 +9,7 @@ ansible-manager 实现的是类似ansible ui 的功能，让你的playbook脚本
 - ansible
 - mariadb
 - centos7
+- etcd3
 
 ### 编译
 - `go build -v`
@@ -21,24 +22,41 @@ ansible-manager 实现的是类似ansible ui 的功能，让你的playbook脚本
 
 - 配置文件 `/etc/ansible-manager/ansible-manager.conf`
 ```
-[ansible_manager]
+[common]
 port=8090
 concurrent=5
 work_path=/tmp/ansible-manager
-# 数据库连接
-mysql_url=127.0.0.1:3306
-mysql_name=ansible
+master_enable=true
+worker_enable=true
+uapi_enable=true
+node_timeout=10
+
+
+[mysql]
+mysql_url=10.21.1.178:3306
+mysql_name=playbook
 mysql_user=root
 mysql_password=123456
-# 登录token密钥
-jwt_secret=XdCdkkffDM44DcDFSSF564bkDfffrcGMhfT0tyd3
-# 是否使用s3作为脚本存储，是则需配置s3_endpoint、s3_key、s3_secret、bucket_name
-s3=false
+
+[local_storage]
+enable=false
+storage_dir=/opt/ansible-manager/repo/
+
+
+[s3_storage]
+enable=true
 s3_endpoint=10.21.1.234:8080
-s3_key=7YW507KJFWC0CYOXLSX0
-s3_secret=XDCAx4atY96wELcSiwv9bkqCf0pCcWCGMhXToY56
+s3_key=V7TRJJ6RMA8SWKDZEW6X
+s3_secret=cNaO54RUWpDypOIuLGDJAIrqeq1vXeQ2QvZzLHMV
 bucket_name=ansible-playbook
 
+[file_log]
+enable=true
+log_dir=/opt/ansible-manager/log/
+
+[etcd]
+enable=true
+endpoints=10.21.1.178:2379
 ```
 
 - 启动`ansible-manager start`

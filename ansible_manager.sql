@@ -71,6 +71,21 @@ CREATE TABLE `ansible_task` (
 ) ENGINE=InnoDB CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `ansible_timer`;
+CREATE TABLE `ansible_timer` (
+  `timer_id`   varchar(64)  NOT NULL,
+  `user_id`   varchar(64)  NOT NULL,
+  `task_id`   varchar(64)  NOT NULL,
+  `timer_name` varchar(255) NOT NULL,
+  `timer_start` int(11) NOT NULL,
+  `timer_interval` int(11) NOT NULL,
+  `timer_repeat` int(11) NOT NULL,
+  `timer_status` tinyint NOT NULL,
+  `created` datetime NOT NULL,
+  PRIMARY KEY (`timer_id`),
+  FOREIGN KEY (`task_id`) REFERENCES `ansible_task` (`task_id`) ON DELETE CASCADE
+) ENGINE=InnoDB CHARSET=utf8;
+
 DROP TABLE IF EXISTS `ansible_user`;
 CREATE TABLE `ansible_user` (
   `user_id`      varchar(64) NOT NULL,

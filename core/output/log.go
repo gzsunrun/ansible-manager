@@ -10,5 +10,5 @@ type LogOutput interface{
 }
 
 func NewLogOutput(id string)(LogOutput,error){
-	return NewFileLog(config.Cfg.Ansible.WorkPath+"/log/"+id+".log")
+	return NewFileLog(config.Cfg.FileLog.Path+id+".log")
 }

@@ -133,7 +133,8 @@ function TaskList(){
 			<td>
 				`+status+`
 				<a href="javascript:ViewTask('`+val.task_name+`','`+val.task_id+`');" class="btn btn-xs btn-info">查看</a>
-                <a href="javascript:GetTask('`+val.task_id+`');" class="btn btn-xs btn-primary">编辑</a>
+				<a href="javascript:CreateTimer('`+val.task_id+`');" class="btn btn-xs btn-primary">创建定时任务</a>
+				<a href="javascript:GetTask('`+val.task_id+`');" class="btn btn-xs btn-primary">编辑</a>
                 <a href="javascript:DelTask('`+val.task_id+`');" class="btn btn-xs btn-danger">删除</a>
             </td>
         </tr>`
@@ -229,6 +230,36 @@ function StopTask(id){
     );
 }
 
+// 创建定时任务
+function CreateTimer(task_id){
+	$('#ttask-id').val(task_id)
+	$("#timer-modal").modal("show")
+}
+
+
+function CommitTimer(){
+	var data = {
+		timer_id: $('#timer-id').val(),
+		task_id: $('#ttask-id').val(),
+        timer_name: $('#timer-name').val(),
+        timer_interval: parseInt($('#timer-interval').val()),
+        timer_repeat: parseInt($('#timer-repeat').val()),
+        timer_status:new Boolean($('#timer-status').val())
+        
+    }
+	AjaxReq(
+        "post",
+        "../ansible/common/timer/create",
+        JSON.stringify(data),
+        function () { },
+        function(){
+			ReqSuccess()
+			$(location).attr("href","../ui/timer.html")
+		},
+        ReqErr
+    );
+}
+
 function ViewTask(name,id){
 	var taskModalTrigger = new $.zui.ModalTrigger({
 		title:"任务："+name,
@@ -270,23 +301,27 @@ function createInvView(){
 		$.each(v.attr,function(i,v){
 			var input
 			if (v.type=="bool"){
-				input=`<select class="form-control attr-value">
-					<option value="yes">yes</option>
-					<option value="no">no</option>
-				</select>`
-				if (v.default=="no"){
-					input=`<select class="form-control attr-value">
+				input=`<div>
+					<select class="form-control attr-value">
 						<option value="yes">yes</option>
-						<option value="no" selected>no</option>
-					</select>`
+						<option value="no">no</option>
+					</select>
+				</div>`
+				if (v.default=="no"){
+					input=`<div>
+						<select class="form-control attr-value">
+							<option value="yes">yes</option>
+							<option value="no" selected>no</option>
+						</select>
+					</div>`
 				}
 				
 			}else{
-				input=`<input class="form-control attr-value" type="text" value="`+v.default+`"/>`
+				input=`<div><input class="form-control attr-value" type="text" value="`+v.default+`"/></div>`
 			}
-			attrHtml+=`<div class="col-md-4 col-sm-10 inv-attr" >
-							<label  class="col-sm-6 attr-name">`+v.key+`</label>
-							<div class="col-sm-6">
+			attrHtml+=`<div class="inv-attr" style="margin-top:10px;">
+							<label  class=" col-md-2 col-sm-6 attr-name">`+v.key+`</label>
+							<div class="col-md-10 col-sm-6">
 								`+input+`
 							</div>
 						</div>`
@@ -294,7 +329,7 @@ function createInvView(){
         var host_attr=""
 		$.each(HOSTS,function(i,v){
 			host_attr+=`<div class="form-group inv-host">
-						<div class="col-sm-2">
+						<div>
 								<label>
 									<input type="checkbox" class="host-name" value="`+v.host_name+`"> `+v.host_alias+`
 								</label>
@@ -303,7 +338,7 @@ function createInvView(){
 						</div>`
 		})
 		$(".inv").append(`<span class="inv-group">
-				<label class="group-name">`+v.group_name+`</label>
+				<label class="group-name">【`+v.group_name+`】</label>
 				`+host_attr+`
 			 </span>`)
 	})

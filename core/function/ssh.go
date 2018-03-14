@@ -89,7 +89,6 @@ func AuthKey(host orm.HostsList)string{
 func AuthKeyByHost(host orm.Hosts)string{
 	signer,err:=ssh.ParsePrivateKey([]byte(host.Key))
 		if err!=nil{
-			log.Error(err)
 			return "fail"
 		}
 		c, err := ssh.Dial("tcp", host.IP+":22", &ssh.ClientConfig{

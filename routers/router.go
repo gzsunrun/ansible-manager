@@ -50,6 +50,13 @@ func init() {
 		beego.NSRouter("/task/del", &controllers.TaskController{}, "get:Del"),
 		beego.NSRouter("/task/notes", &controllers.TaskController{}, "get:GetNotes"),
 		beego.NSRouter("/task/count", &controllers.TaskController{}, "get:GetTaskCount"),
+		beego.NSRouter("/nodes", &controllers.TaskController{}, "get:GetNodes"),
+		beego.NSRouter("/timer/create", &controllers.TimerController{}, "post:Create"),
+		beego.NSRouter("/timer/list", &controllers.TimerController{}, "get:List"),
+		beego.NSRouter("/timer/get", &controllers.TimerController{}, "get:Get"),
+		beego.NSRouter("/timer/stop", &controllers.TimerController{}, "get:Stop"),
+		beego.NSRouter("/timer/start", &controllers.TimerController{}, "get:Start"),
+		beego.NSRouter("/timer/del", &controllers.TimerController{}, "get:Del"),
 	)
 
 

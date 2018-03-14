@@ -9,5 +9,8 @@ func SetLog(path string)error{
 	if err != nil {
 		logs.Error("fail to config logrus")
 	}
+	logs.EnableFuncCallDepth(true)
+	logs.SetLogFuncCallDepth(3)
+	logs.SetLogger("console")
 	return err
 }

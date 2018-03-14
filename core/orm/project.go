@@ -97,12 +97,22 @@ func DelAllHostsByPid(pid string)error{
 	return err
 }
 
-func FindHostFromProject(pid string,hosts interface{})error{
+func FindHostFromProject(pid string,hosts *[]HostsList)error{
 	err:=MysqlDB.Table("ansible_project_host").
 	Join("INNER","ansible_host","ansible_host.host_id=ansible_project_host.host_id").
 	Where("project_id=?",pid).Find(hosts)
 	if err!=nil{
 		log.Error(err)
+	}
+	for i,h:=range *hosts{
+		psw,err:=RsaDecrypt(h.Password)
+		if err==nil{
+			(*hosts)[i].Password=psw
+		}
+		key,err:=RsaDecrypt(h.Key)
+		if err==nil{	
+			(*hosts)[i].Key=key
+		}
 	}
 	return err
 }

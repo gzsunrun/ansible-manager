@@ -20,26 +20,26 @@ var Storage FileStorage
 
 func SetStorage()error{
 	var err error
-	if config.Cfg.Ansible.S3Status{
-		Storage,err = NewS3Storage(config.Cfg.Ansible.S3URL,
-			config.Cfg.Ansible.S3Key,
-			config.Cfg.Ansible.S3Secret,
-			config.Cfg.Ansible.BucketName,
+	if config.Cfg.S3.Enable{
+		Storage,err = NewS3Storage(config.Cfg.S3.S3URL,
+			config.Cfg.S3.S3Key,
+			config.Cfg.S3.S3Secret,
+			config.Cfg.S3.BucketName,
 		)
 	}else{
-		Storage,err = NewLocalStorage(config.Cfg.Ansible.WorkPath+"/repo/")
+		Storage,err = NewLocalStorage(config.Cfg.LocalStorage.Path)
 	}
 	return err
 }
 
 func NewStorage()(FileStorage,error){
-	if config.Cfg.Ansible.S3Status{
-		return NewS3Storage(config.Cfg.Ansible.S3URL,
-			config.Cfg.Ansible.S3Key,
-			config.Cfg.Ansible.S3Secret,
-			config.Cfg.Ansible.BucketName,
+	if config.Cfg.S3.Enable{
+		return NewS3Storage(config.Cfg.S3.S3URL,
+			config.Cfg.S3.S3Key,
+			config.Cfg.S3.S3Secret,
+			config.Cfg.S3.BucketName,
 		)
 	}
 
-	return NewLocalStorage(config.Cfg.Ansible.WorkPath+"/repo/")
+	return NewLocalStorage(config.Cfg.LocalStorage.Path)
 }

@@ -307,7 +307,7 @@ li {
     font-weight: 600;
 }
 
-td{
+th td{
     text-align: center;
 }
 
@@ -1276,4 +1276,9 @@ fieldset[disabled] .checkbox-custom label {
 .radio-lg input[type="radio"]:checked+label::before,
 .radio-lg input[type="radio"]:checked+input[type="hidden"]+label::before {
     border-width: 12px;
+}
+
+/*attr*/
+.inv-attr{
+    margin-top: 10px;
 }

@@ -7,7 +7,7 @@ import (
 	log "github.com/astaxie/beego/logs"
 	"github.com/satori/go.uuid"
 	"github.com/gzsunrun/ansible-manager/core/orm"
-	"github.com/gzsunrun/ansible-manager/core/tasks"
+	"github.com/gzsunrun/ansible-manager/core/kv"
 )
 
 type TaskController struct{
@@ -67,14 +67,51 @@ func (c *TaskController)Start(){
 		c.SetResult(err, nil, 400)
 		return
 	}
-	tasks.AddTask(tid)
-	c.SetResult(nil,tid,200,"task_id")
+	master:=false
+	worker:=false
+	for _,node:=range kv.DefaultClient.GetStorage().Nodes{
+		if node.Master{
+			master=true
+		}
+		if node.Worker{
+			worker=true
+		}
+	}
+	if master&&worker{
+		err=kv.DefaultClient.AddScheduler(kv.Task{
+			ID:task.ID,
+			Timer:false,
+		})
+		if err != nil {
+			c.SetResult(err, nil, 400)
+			return
+		}
+		c.SetResult(nil,tid,200,"task_id")
+	}else{
+		c.SetResult(err, nil, 400)
+	}
+	
 }
 
 func (c *TaskController)Stop(){
 	defer c.ServeJSON()
 	tid:=c.GetString("task_id")
-	tasks.StopTask(tid)
+	if _,ok:=kv.DefaultClient.GetStorage().Tasks[tid];ok{
+		task:=new(orm.Task)
+		task.ID=tid
+		task.Status="stop"
+		err :=orm.UpdateTask(task)
+		if err!=nil{
+			c.SetResult(err, nil, 400)
+			return
+		}
+		c.SetResult(nil,nil,204)
+	}
+	err:=kv.DefaultClient.DeleteTask(tid)
+	if err!=nil{
+		c.SetResult(err, nil, 400)
+		return
+	}
 	c.SetResult(nil,nil,204)
 }
 
@@ -93,7 +130,12 @@ func (c *TaskController)Get(){
 func (c *TaskController)Del(){
 	defer c.ServeJSON()
 	tid:=c.GetString("task_id")
-	err:=orm.DelTask(tid)
+	err:=kv.DefaultClient.DeleteTask(tid)
+	if err!=nil{
+		c.SetResult(err, nil, 400)
+		return
+	}
+	err=orm.DelTask(tid)
 	if err!=nil{
 		c.SetResult(err,nil,400)
 		return
@@ -111,7 +153,7 @@ func(w *W)Write(p []byte)(int,error){
 }
 
 type NewPlaybookParse struct {
-	Hosts []orm.Hosts  						`json:"hosts"`
+	Hosts []orm.HostsList  						`json:"hosts"`
 	Group []orm.Group 						`json:"group"`
 	Vars  map[string]map[string]interface{} `json:"vars"`
 }
@@ -139,7 +181,7 @@ func (c *TaskController)GetNotes(){
 		c.SetResult(err,nil,400)
 		return
 	}
-	var hosts []orm.Hosts
+	var hosts []orm.HostsList
 	err = orm.FindHostFromProject(task.ProjectID,&hosts)
 	if err!=nil{
 		c.SetResult(err,nil,400)
@@ -196,4 +238,13 @@ func (c *TaskController)GetTaskCount(){
 		return
 	}
 	c.SetResult(nil,counts,200)
+}
+
+func (c *TaskController)GetNodes(){
+	defer c.ServeJSON()
+	nodes :=make([]kv.Node,0)
+	for _,node:=range kv.DefaultClient.GetStorage().Nodes{
+		nodes=append(nodes,node)
+	}
+	c.SetResult(nil,nodes,200)
 }
