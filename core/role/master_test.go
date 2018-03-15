@@ -3,7 +3,7 @@ package role_test
 import (
 	"strconv"
 	"testing"
-	"github.com/gzsunrun/ansible-manager/core/master"
+	"github.com/gzsunrun/ansible-manager/core/role"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 )
 
@@ -46,7 +46,7 @@ func Test_Scheduler(t *testing.T){
 		}
 	}
 
-	if master.Scheduler(n,task)!="0"{
+	if role.Scheduler(n,task)==""{
 		t.Error("res is error")
 	}
 }

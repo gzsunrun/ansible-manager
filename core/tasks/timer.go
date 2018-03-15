@@ -1,7 +1,6 @@
 package tasks
 
 import (
-	"fmt"
 	"time"
 
 	log "github.com/astaxie/beego/logs"
@@ -93,20 +92,4 @@ func SetTimer(timerID string){
 
 func StopTimer(tid string){
 	TChan[tid]<-true
-}
-
-func tT(){
-	t := time.NewTicker(3 * time.Second)
-    done := make(chan bool, 1)
-        go func() {
-                for {
-                    select {
-                        case <-t.C:
-							  fmt.Println("aaa")
-							  t = time.NewTicker(10 * time.Second)
-					}
-               	 }
-        }()
-        <-done
-        return
 }

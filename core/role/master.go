@@ -61,7 +61,7 @@ func Scheduler(n map[string]kv.Node,t map[string]kv.Task)string{
 			if k==node.NodeID&&node.Worker{
 				flag=false
 			}
-			if counts[node.NodeID]==0{
+			if _,ok:=counts[node.NodeID];!ok{
 				counts[node.NodeID]=0
 			}
 		}
