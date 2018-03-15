@@ -6,7 +6,7 @@ go:
 before_install:
   - go get github.com/astaxie/beego
   - go get github.com/go-ini/ini
-  - go go get github.com/golang/protobuf/ptypes
+  - go get github.com/golang/protobuf/ptypes
   - go get google.golang.org/grpc
   - go get github.com/coreos/etcd
   - go get google.golang.org/genproto/googleapis/rpc/status
