@@ -50,7 +50,7 @@ func (c *TimerController)Create(){
 		c.SetResult(nil,nil,204)
 		return
 	}
-	timer.ID=uuid.NewV4().String()
+	timer.ID=uuid.Must(uuid.NewV4()).String()
 	err:=orm.CreateTimer(&timer)
 	if err != nil {
 		c.SetResult(err, nil, 400)

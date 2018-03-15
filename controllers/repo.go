@@ -31,7 +31,7 @@ func (c *RepoController) Create() {
 	repo := orm.RepositoryInsert{}
 	repo.Name=c.GetString("repo_name")
 	repo.Desc=c.GetString("repo_desc")
-	repo.ID= uuid.NewV4().String()
+	repo.ID= uuid.Must(uuid.NewV4()).String()
 	f, _, err := c.GetFile("repo_path")
 	if err != nil {
 		log.Error("Getfile",err)
@@ -39,7 +39,7 @@ func (c *RepoController) Create() {
 		return
 	}
 	f.Close()
-	repoPath := uuid.NewV4().String()
+	repoPath := uuid.Must(uuid.NewV4()).String()
 	repo.Path = repoPath
 	err = c.SaveToFile("repo_path", config.Cfg.Common.WorkPath+"/"+repoPath)
 	if err != nil {

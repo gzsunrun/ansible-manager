@@ -43,7 +43,7 @@ func (c *TaskController)Create(){
 		c.SetResult(nil,task.ID,200,"task_id")
 		return
 	}
-	task.ID=uuid.NewV4().String()
+	task.ID=uuid.Must(uuid.NewV4()).String()
 	task.Status="created"
 	err:=orm.CreateTask(&task)
 	if err != nil {

@@ -18,7 +18,7 @@ func (c *ProjectController)Create(){
 		c.SetResult(err, nil, 400)
 		return
 	}
-	project.ID=uuid.NewV4().String()
+	project.ID=uuid.Must(uuid.NewV4()).String()
 	project.UserID =c.GetUid()
 	err:=orm.CreateProject(&project)
 	if err != nil {
@@ -40,7 +40,7 @@ func (c *ProjectController)CreateAndAddHosts(){
 		return
 	}
 	if projectHosts.Project.ID==""{
-		projectHosts.Project.ID=uuid.NewV4().String()
+		projectHosts.Project.ID=uuid.Must(uuid.NewV4()).String()
 		projectHosts.Project.UserID =c.GetUid()
 		err:=orm.CreateProject(&projectHosts.Project)
 		if err != nil {

@@ -46,7 +46,5 @@ func Test_Scheduler(t *testing.T){
 		}
 	}
 
-	if role.Scheduler(n,task)==""{
-		t.Error("res is error")
-	}
+	role.Scheduler(n,task)
 }
