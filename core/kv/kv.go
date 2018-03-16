@@ -43,16 +43,25 @@ func SetKVClient()error{
 	worker:=config.Cfg.Common.Worker
 	master:=config.Cfg.Common.Master
 	timeout:=config.Cfg.Common.Timeout
-	c,err:=NewEtcd(ep,timeout,port,"/api/ansible/ws",worker,master)
-	if err!=nil{
-		return err
+	if config.Cfg.Etcd.Enable{
+		c,err:=NewEtcd(ep,timeout,port,"/api/ansible/ws",worker,master)
+		if err!=nil{
+			return err
+		}
+		DefaultClient=c
+		go c.KeepNode()
+		c.RegNode()
+		err=c.SyncData()
+		if err!=nil{
+			return err
+		}
+	}else{
+		c,err:=NewLocalKV(port,"/api/ansible/ws",worker,master)
+		if err!=nil{
+			return err
+		}
+		DefaultClient=c
 	}
-	DefaultClient=c
-	go c.KeepNode()
-	c.RegNode()
-	err=c.SyncData()
-	if err!=nil{
-		return err
-	}
+	
 	return err
 }

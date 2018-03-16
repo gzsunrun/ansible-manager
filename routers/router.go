@@ -28,6 +28,8 @@ func init() {
 		beego.NSRouter("/repo", &controllers.RepoController{}, "get:List"),
 		beego.NSRouter("/repo/create", &controllers.RepoController{}, "post:Create"),
 		beego.NSRouter("/repo/delete", &controllers.RepoController{}, "get:Delete"),
+		beego.NSRouter("/repo/git/sync", &controllers.RepoController{}, "get:SyncGit"),
+		beego.NSRouter("/repo/git/status", &controllers.RepoController{}, "get:StorageType"),
 		beego.NSRouter("/vars", &controllers.RepoController{}, "get:Vars"),
 		beego.NSRouter("/hosts", &controllers.HostController{}, "get:ListNO"),
 		beego.NSRouter("/hosts_status", &controllers.HostController{}, "get:List"),
@@ -59,10 +61,9 @@ func init() {
 		beego.NSRouter("/timer/del", &controllers.TimerController{}, "get:Del"),
 	)
 
-
 	beego.AddNamespace(authApi,commonApi)
 	beego.InsertFilter("/ansible/common/*", beego.BeforeRouter, auth.JwtAuthFilter)
-
+	
 	beego.Handler("/api/ansible/ws", socketHandler(sockets.Handler))
 }
 

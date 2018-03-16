@@ -132,6 +132,8 @@ function GetHost(id){
             $('#host-name').val(msg.host_name)
             $('#host-ip').val(msg.host_ip)
             $('#host-user').val(msg.host_user)
+            $('#host-password').val(""),
+            $('#host-key').val("")
             $('#host-modal').modal('show');
         },
         ReqErr
@@ -144,4 +146,6 @@ function CleanHostForm(){
     $('#host-name').val("")
     $('#host-ip').val("")
     $('#host-user').val("")
+    $('#host-password').val(""),
+    $('#host-key').val("")
 }

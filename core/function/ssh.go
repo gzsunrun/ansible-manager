@@ -5,7 +5,6 @@ import (
 	"golang.org/x/crypto/ssh"
 	"strings"
 
-	log "github.com/astaxie/beego/logs"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	
 )
@@ -64,7 +63,6 @@ func AuthPassword(host orm.HostsList)string{
 func AuthKey(host orm.HostsList)string{
 	signer,err:=ssh.ParsePrivateKey([]byte(host.Key))
 		if err!=nil{
-			log.Error(err)
 			return "fail"
 		}
 		if host.User==""{

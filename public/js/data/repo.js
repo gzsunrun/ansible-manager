@@ -1,10 +1,17 @@
+var GITSTATUS
 
 $(function(){
+    GitStatus()
     GetRepoList()
 })
 
 $("#upload").click(function(){
-    CreateRepo()
+    if (GITSTATUS){
+        AddGit()
+    }else{
+        CreateRepo()
+    }
+    
 })
 
 $("#repo-add").click(function(){
@@ -38,16 +45,31 @@ function GetRepoList() {
     );
 }
 
+function GitStatus(){
+    AjaxReq(
+        "get",
+        "../ansible/common/repo/git/status",
+        {},
+        function () { },
+        function (msg) { 
+            GITSTATUS=msg.status
+            $("#repo-add").removeClass("disabled")
+            if (msg.status){
+                $("#repo-url").removeClass("hide")
+            }else{
+                $("#repo-file").removeClass("hide")
+            }
+        },
+        ReqErr
+    );
+}
+
 // update host
 function CreateRepo(){
     var fd = new FormData();
     fd.append("repo_path",$('#repo-path')[0].files[0]);
     fd.append("repo_name",$("#repo-name").val());
     fd.append("repo_desc",$("#repo-desc").val());
-   if ($("#repo-name").val()==""||$('#repo-path')[0].files[0]==null){
-       alert("脚本名不能为空")
-       return
-   }
     var xhr = new XMLHttpRequest();
     if ( xhr.upload ) {
         $("#upload").addClass("disabled")
@@ -59,6 +81,7 @@ function CreateRepo(){
                 $("#repo-path").val("")
                 $("#repo-parse").val("")
                 $('#repo-modal').modal('hide');
+                $("#upload").removeClass("disabled")
                 GetRepoList()    
             }else{
                 new $.zui.Messager("上传失败", {
@@ -71,6 +94,27 @@ function CreateRepo(){
     xhr.open('post', '../ansible/common/repo/create', true);
     xhr.setRequestHeader('Authorization', $.cookie("Auth"));
     xhr.send(fd);
+}
+
+function AddGit(){
+    $("#upload").addClass("disabled")
+    var git_url=$("#repo-git").val()
+    AjaxReq(
+        "get",
+        "../ansible/common/repo/git/sync",
+        {git_url:git_url},
+        function () { },
+        function () {
+            GetRepoList()
+            $('#repo-modal').modal('hide');
+            $("#upload").removeClass("disabled")
+            ReqSuccess()
+        },
+        function () { 
+            ReqErr()
+            $("#upload").removeClass("disabled")
+        }
+    )
 }
 
 // delete host

@@ -29,8 +29,6 @@ func (c *RepoController) List() {
 func (c *RepoController) Create() {
 	defer c.ServeJSON()
 	repo := orm.RepositoryInsert{}
-	repo.Name=c.GetString("repo_name")
-	repo.Desc=c.GetString("repo_desc")
 	repo.ID= uuid.Must(uuid.NewV4()).String()
 	f, _, err := c.GetFile("repo_path")
 	if err != nil {
@@ -53,6 +51,12 @@ func (c *RepoController) Create() {
 	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
+	}
+	if c.GetString("repo_name")!=""{
+		repo.Name=c.GetString("repo_name")
+	}
+	if c.GetString("repo_desc")!=""{
+		repo.Desc=c.GetString("repo_desc")
 	}
 	_, err = os.Stat(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo.png")
 	if err == nil || os.IsExist(err) {
@@ -122,6 +126,41 @@ func (c *RepoController) Vars(){
 		"tag": repo.Tag,
 	}
 	c.SetResult(nil,data,200)
+}
+
+func (c *RepoController) SyncGit(){
+	repo := orm.RepositoryInsert{}
+	repo.ID= uuid.Must(uuid.NewV4()).String()
+	repo.Path=c.GetString("git_url")
+	repoPath:=uuid.Must(uuid.NewV4()).String()
+	repoParse:=storage.StorageParse{
+		RemotePath:repo.Path,
+		LocalPath:config.Cfg.Common.WorkPath + "/" + repoPath,
+	}
+	err:=storage.Storage.Get(&repoParse)
+	if err!=nil{
+		c.SetResult(err, nil, 400)
+		return
+	}
+
+	defer os.Remove(config.Cfg.Common.WorkPath + "/" + repoPath)
+	defer os.RemoveAll(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir")
+	err = function.ReadVars(config.Cfg.Common.WorkPath + "/" + repoPath,&repo)
+	if err != nil {
+		c.SetResult(err, nil, 400)
+		return
+	}
+	err = orm.CreateRepo(repo)
+	if err != nil {
+		c.SetResult(err, nil, 400)
+		return
+	}
+	c.SetResult(nil, nil, 204)
+}
+
+func (c *RepoController) StorageType() {
+	defer c.ServeJSON()
+	c.SetResult(nil, config.Cfg.Git.Enable, 200,"status")
 }
 
 func (c *RepoController) Health() {

@@ -67,10 +67,12 @@ func NewEtcd(endpoints []string,ttl int64,port int,path string,worker,master boo
 	},nil
 }
 
+// get this node info
 func (ec *EtcdClient)LocalNode()*Node{
 	return ec.Node
 }
 
+//del all task
 func (ec *EtcdClient)DelAllTask()error{
 	_,err:=ec.Delete(tasksPath,clientv3.WithPrefix())
 	return err

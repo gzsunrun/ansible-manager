@@ -72,6 +72,21 @@ func ReadVars(filePath string ,repo *orm.RepositoryInsert) error{
 		}
 		repo.Note=string(notes)
 	}
+
+	_, err = os.Stat(dir + "/info.yml")
+	if err == nil || os.IsExist(err) {
+		info, err := ioutil.ReadFile(dir + "/info.yml")
+		if err != nil {
+			log.Error(err)
+			return  err
+		}
+
+		err=yaml.Unmarshal(info,repo)
+		if err != nil {
+			log.Error(err)
+			return  err
+		}
+	}
 	varsPaths, err := getFilelist(dir + "/vars")
 	if err != nil {
 		log.Error(err)

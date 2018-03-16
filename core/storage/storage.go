@@ -26,7 +26,9 @@ func SetStorage()error{
 			config.Cfg.S3.S3Secret,
 			config.Cfg.S3.BucketName,
 		)
-	}else{
+	}else if config.Cfg.Git.Enable{
+		Storage = NewGit()
+	} else{
 		Storage,err = NewLocalStorage(config.Cfg.LocalStorage.Path)
 	}
 	return err

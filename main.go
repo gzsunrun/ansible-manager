@@ -20,7 +20,7 @@ const (
 	SERVICE_DESC = "ansible-manager"
 	LOG_PATH     = "/var/log/ansible-manager/log.log"
 	CONFIG_PATH  = "/etc/ansible-manager/ansible-manager.conf"
-	HtmlPath 	="/usr/local/html/ansible-manager/public/"
+	HtmlPath 	="/root/go/src/github.com/gzsunrun/ansible-manager/public"//"/usr/local/html/ansible-manager/public/"
 )
 
 func run() {
@@ -48,7 +48,9 @@ func run() {
 	beego.BConfig.RunMode = beego.PROD
 	beego.BConfig.CopyRequestBody = true
 	beego.BConfig.Log.FileLineNum = true
-	beego.SetStaticPath("/ui", HtmlPath)
+	if config.Cfg.Common.UAPI{
+		beego.SetStaticPath("/ui", HtmlPath)
+	}
 	beego.BConfig.Listen.HTTPPort = config.Cfg.Common.Port
 	beego.Run()
 }

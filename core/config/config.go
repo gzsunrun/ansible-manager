@@ -14,8 +14,9 @@ type Config struct {
 	Mysql			Mysql			`ini:"mysql"`
 	LocalStorage	LocalStorage	`ini:"local_storage"`
 	S3				S3				`ini:"s3_storage"`
-	Etcd	Etcd					`ini:"etcd"`
-	FileLog	FileLog					`ini:"file_log"`
+	Git				Git				`ini:"git_storage"`
+	Etcd			Etcd			`ini:"etcd"`
+	FileLog			FileLog			`ini:"file_log"`
 }
 
 type Common	struct{
@@ -46,6 +47,10 @@ type S3 struct{
 	S3Key      		string `ini:"s3_key"`
 	S3Secret   		string `ini:"s3_secret"`
 	BucketName 		string `ini:"bucket_name"`
+}
+
+type Git struct {
+	Enable   		bool   `ini:"enable"`
 }
 
 type Etcd struct{

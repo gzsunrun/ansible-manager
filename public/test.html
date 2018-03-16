@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ansible Manager</title>
+    <!-- zui css -->
+    <link rel="stylesheet" href="dist/css/zui.min.css">
+    <link rel="stylesheet" href="dist/lib/board/zui.board.min.css">
+    <link rel="stylesheet" href="dist/theme/blue.css">
+    <!-- app css -->
+    <link rel="stylesheet" href="css/jsoneditor.css"/>
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        .board-item.drag-shadow {
+            z-index: 9999
+        }
+    </style>
+    <!-- jquery js -->
+    <script src="dist/lib/jquery/jquery.js"></script>
+    <script src="js/jquery.jsoneditor.min.js"></script> 
+    <script src="dist/lib/jquery/jquery.cookie.js"></script>
+</head>
+
+<body>
+    <div id="editor" class="json-editor"></div>  
+<pre id="json"></pre>  
+</body>
+    <!-- zui js -->
+    <script src="dist/js/zui.min.js"></script>
+    <script src="dist/lib/board/zui.board.min.js"></script> 
+<script>  
+    var json = {  
+       "string": "foo",  
+       "number": 5,  
+       "array": [1, 2, 3],  
+       "object": {  
+         "property": "value",  
+         "subobj": {  
+         "arr": ["foo", "ha"],  
+         "numero": 1  
+       }  
+    }};  
+    $('#editor').jsonEditor(json, { change: function() {  
+        $('#json').html(JSON.stringify(json));  
+    }
+     });  
+</script> 
+</body>
+
+</html>

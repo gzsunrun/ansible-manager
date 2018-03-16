@@ -12,7 +12,8 @@ var TASKVARS={
     repo_id:""
 }
 $(function(){
-    TaskList()
+	TaskList()
+	setInterval("TaskList()",2000)
     GetHostList()
     GetRepoList()
 })
@@ -75,13 +76,14 @@ function GetRepoVars(id,update){
         function () { },
         function(msg){
 			REPOVARS=msg
-            TASKVARS.task_vars=msg.vars
             createInvView()
-			createVarsView()
 			if (update){
 				editInvView()
             	$('#task-modal').modal('show');
+			}else{
+				TASKVARS.task_vars=msg.vars
 			}
+			createVarsView()
         },
         ReqErr
     );
@@ -329,19 +331,19 @@ function createInvView(){
         var host_attr=""
 		$.each(HOSTS,function(i,v){
 			host_attr+=`<div class="form-group inv-host">
-						<div>
-								<label>
-									<input type="checkbox" class="host-name" value="`+v.host_name+`"> `+v.host_alias+`
-								</label>
+						<div class="checkbox-custom checkbox-primary">
+							<input type="checkbox" class="host-name" value="`+v.host_name+`"> 
+							<label for="inputUnchecked">`+v.host_alias+`</label>
 						</div>`
 						+attrHtml+`
 						</div>`
 		})
 		$(".inv").append(`<span class="inv-group">
-				<label class="group-name">【`+v.group_name+`】</label>
+				<label class="group-name">`+v.group_name+`</label>
 				`+host_attr+`
 			 </span>`)
 	})
+	$(".inv-attr").hide()
 	onCheck()
 }
 
@@ -412,16 +414,32 @@ function createInvJSON(){
 
 function createVarsView(){
 	$("#playbook-parse").empty()
-	$.each(TASKVARS.task_vars,function(i,v){
+	
+	 $.each(TASKVARS.task_vars,function(i,v){
 		$("#playbook-parse").append( `
 		<div class="form-group">
 			<label for="playbook-value" class="col-sm-2">`+v.vars_name+`</label>
 			<div class="col-md-9 col-sm-10">
-				<textarea class="form-control vars-value" rows="10">`+JSON.stringify(v.vars_value.vars).replace(/\\n/g,"\n")+`</textarea>
+				<div id="editor-`+i+`" class="json-editor"></div>  
 			</div>
 		</div>`)
+		$('#editor-'+i).jsonEditor(v.vars_value.vars, 
+			{ change: function(msg) {  
+				TASKVARS.task_vars[i].vars_value.vars=msg 
+			}
+ 		}); 
 	})
-	$(".inv-attr").hide()
+	
+	// $.each(TASKVARS.task_vars,function(i,v){
+	// 	$("#playbook-parse").append( `
+	// 	<div class="form-group">
+	// 		<label for="playbook-value" class="col-sm-2">`+v.vars_name+`</label>
+	// 		<div class="col-md-9 col-sm-10">
+	// 			<textarea class="form-control vars-value" rows="10">`+JSON.stringify(v.vars_value.vars).replace(/\\n/g,"\n")+`</textarea>
+	// 		</div>
+	// 	</div>`)
+	// })
+	//$(".inv-attr").hide()
 }
 
 function onCheck(){

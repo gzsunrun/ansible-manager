@@ -1282,3 +1282,11 @@ fieldset[disabled] .checkbox-custom label {
 .inv-attr{
     margin-top: 10px;
 }
+
+.group-name{
+    background: #039BE5;
+    padding: 3px;
+    width: 100%;
+    color: #ddd;
+    font-size: 15px;
+}
