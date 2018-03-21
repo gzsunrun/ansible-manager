@@ -2,7 +2,6 @@ package auth
 
 import (
 	"time"
-	"fmt"
 
 	"github.com/astaxie/beego/context"
 	"github.com/dgrijalva/jwt-go"
@@ -55,6 +54,9 @@ func IssueTokenUsingDgrijalva(uid string, meta interface{}) (string, error) {
 
 
 func JwtAuthFilter(ctx *context.Context) {
+	if ctx.Request.RequestURI == "/ansible/login" {
+		return
+	}
 	token, err := request.ParseFromRequestWithClaims(ctx.Request,
 		request.AuthorizationHeaderExtractor,
 		&AnsibleJwtClaims{},
@@ -62,12 +64,30 @@ func JwtAuthFilter(ctx *context.Context) {
 			return []byte(APIAUTH_SECRET_KEY), nil
 		})
 	if err != nil || token.Claims.(*AnsibleJwtClaims).Uid == "" {
-		fmt.Println(err)
-		ctx.Output.Status = 401
-		ctx.Output.JSON(err, false, false)
+		ctx.Output.Status=401
+		ctx.Output.JSON(err,false,false)
 		return
 	}
 	
 		uid := token.Claims.(*AnsibleJwtClaims).Uid
 		ctx.Input.SetData("uid", uid)
+}
+
+func UIAuthFilter(ctx *context.Context) {
+	if ctx.Request.RequestURI == "/ansible/login.html" {
+		return
 	}
+	token, err := request.ParseFromRequestWithClaims(ctx.Request,
+		request.AuthorizationHeaderExtractor,
+		&AnsibleJwtClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(APIAUTH_SECRET_KEY), nil
+		})
+	if err != nil || token.Claims.(*AnsibleJwtClaims).Uid == "" {
+		ctx.Redirect(302,"/ansible/login.html")
+		return
+	}
+	
+		uid := token.Claims.(*AnsibleJwtClaims).Uid
+		ctx.Input.SetData("uid", uid)
+}

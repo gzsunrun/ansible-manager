@@ -61,6 +61,7 @@ func init() {
 		beego.NSRouter("/timer/del", &controllers.TimerController{}, "get:Del"),
 	)
 
+
 	beego.AddNamespace(authApi,commonApi)
 	beego.InsertFilter("/ansible/common/*", beego.BeforeRouter, auth.JwtAuthFilter)
 	

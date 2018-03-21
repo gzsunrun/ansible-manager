@@ -7,11 +7,13 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/orm"
 )
 
-type ProjectController struct{
+// ProjectController controller of project.
+type ProjectController struct {
 	BaseController
 }
 
-func (c *ProjectController)Create(){
+// Create create a project.
+func (c *ProjectController) Create() {
 	defer c.ServeJSON()
 	project:=orm.Project{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &project); err != nil {
@@ -28,11 +30,14 @@ func (c *ProjectController)Create(){
 	c.SetResult(nil,nil,204)
 }
 
+// ProjectAndHosts a struct that include project and host.
 type ProjectAndHosts struct{
 	Project 		orm.Project			`json:"project"`
 	ProjectHosts 	[]orm.ProjectHost   `json:"project_hosts"`
 }
-func (c *ProjectController)CreateAndAddHosts(){
+
+// CreateAndAddHosts create a project and add hosts.
+func (c *ProjectController) CreateAndAddHosts() {
 	defer c.ServeJSON()
 	projectHosts:=ProjectAndHosts{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &projectHosts); err != nil {
@@ -59,7 +64,7 @@ func (c *ProjectController)CreateAndAddHosts(){
 			return
 		}
 	}
-	for i,_:=range projectHosts.ProjectHosts{
+	for i:=range projectHosts.ProjectHosts{
 		projectHosts.ProjectHosts[i].ProjectID=projectHosts.Project.ID
 	}
 	err :=orm.AddHostToProject(&projectHosts.ProjectHosts)
@@ -70,6 +75,7 @@ func (c *ProjectController)CreateAndAddHosts(){
 	c.SetResult(nil,nil,204)
 }
 
+// GetProject return the project info with project uuid.
 func (c *ProjectController)GetProject(){
 	defer c.ServeJSON()
 	pid:=c.GetString("project_id")
@@ -91,6 +97,7 @@ func (c *ProjectController)GetProject(){
 	c.SetResult(err, data, 200)
 }
 
+// List return list of project by user uuid.
 func (c *ProjectController)List(){
 	defer c.ServeJSON()
 	projects:=[]orm.Project{}
@@ -103,6 +110,7 @@ func (c *ProjectController)List(){
 	c.SetResult(nil,projects,200)
 }
 
+// Del delete project by project uuid.
 func (c *ProjectController)Del(){
 	defer c.ServeJSON()
 	pid:=c.GetString("project_id")
@@ -114,6 +122,7 @@ func (c *ProjectController)Del(){
 	c.SetResult(nil,nil,204)
 }
 
+// AddHost add a host to project
 func (c *ProjectController)AddHost(){
 	defer c.ServeJSON()
 	projectHost:= []orm.ProjectHost{}
@@ -129,6 +138,7 @@ func (c *ProjectController)AddHost(){
 	c.SetResult(nil,nil,204)
 }
 
+// DelHost delete host from project
 func (c ProjectController)DelHost(){
 	defer c.ServeJSON()
 	projectHost:= orm.ProjectHost{}
@@ -144,6 +154,7 @@ func (c ProjectController)DelHost(){
 	c.SetResult(nil,nil,204)
 }
 
+// HostList get all hosts in project by project uuid. 
 func (c *ProjectController)HostList(){
 	defer c.ServeJSON()
 	pid:=c.GetString("project_id")

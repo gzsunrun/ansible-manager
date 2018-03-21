@@ -24,7 +24,6 @@ mysql -u 用户名 -p密码  ansible_manager < ansible_manager.sql
 
 ```
 
-- 静态文件public的文件放置 `/var/lib/ansible-manager/public/`
 
 - 配置文件 `/etc/ansible-manager/ansible-manager.conf`，如下：
 ```
