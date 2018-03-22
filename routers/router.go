@@ -3,11 +3,11 @@ package routers
 import (
 	"net/http"
 
-	"github.com/gzsunrun/ansible-manager/controllers"
-	"github.com/gzsunrun/ansible-manager/core/sockets"
-	"github.com/gzsunrun/ansible-manager/core/auth"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
+	"github.com/gzsunrun/ansible-manager/controllers"
+	"github.com/gzsunrun/ansible-manager/core/auth"
+	"github.com/gzsunrun/ansible-manager/core/sockets"
 )
 
 func init() {
@@ -20,7 +20,7 @@ func init() {
 		beego.NSRouter("/login", &controllers.UserController{}, "post:Login"),
 	)
 
-	commonApi:=beego.NewNamespace("/ansible/common",
+	commonApi := beego.NewNamespace("/ansible/common",
 		beego.NSRouter("/user/info", &controllers.UserController{}, "get:Info"),
 		beego.NSRouter("/user/create", &controllers.UserController{}, "post:Create"),
 		beego.NSRouter("/user", &controllers.UserController{}, "get:List"),
@@ -61,10 +61,9 @@ func init() {
 		beego.NSRouter("/timer/del", &controllers.TimerController{}, "get:Del"),
 	)
 
-
-	beego.AddNamespace(authApi,commonApi)
+	beego.AddNamespace(authApi, commonApi)
 	beego.InsertFilter("/ansible/common/*", beego.BeforeRouter, auth.JwtAuthFilter)
-	
+
 	beego.Handler("/api/ansible/ws", socketHandler(sockets.Handler))
 }
 

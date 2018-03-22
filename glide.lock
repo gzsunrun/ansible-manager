@@ -1,0 +1,146 @@
+hash: 82c0f318d7d6c1b7f09b19e474e1ed9a98fafdfb25441d1a445683f877586e95
+updated: 2018-03-22T14:36:35.655253358+08:00
+imports:
+- name: github.com/astaxie/beego
+  version: f16688817aa428d10361394015b40d096b680542
+  subpackages:
+  - config
+  - context
+  - context/param
+  - grace
+  - logs
+  - plugins/cors
+  - session
+  - toolbox
+  - utils
+- name: github.com/coreos/etcd
+  version: 31de8345f985c0f0a0a5a2dcf12c51ba2e5ba9a0
+  subpackages:
+  - auth/authpb
+  - clientv3
+  - clientv3/balancer
+  - etcdserver/api/v3rpc/rpctypes
+  - etcdserver/etcdserverpb
+  - mvcc/mvccpb
+  - pkg/logutil
+  - pkg/types
+- name: github.com/coreos/go-systemd
+  version: d7b55e18be11bfd0d09b6bd1be308332818b4f46
+  subpackages:
+  - journal
+- name: github.com/coreos/pkg
+  version: 97fdf19511ea361ae1c100dd393cc47f8dcfa1e1
+  subpackages:
+  - capnslog
+- name: github.com/dgrijalva/jwt-go
+  version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
+  subpackages:
+  - request
+- name: github.com/ghodss/yaml
+  version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
+- name: github.com/go-ini/ini
+  version: 6ecc596bd756a16c6e93e4ef9225ecdb9f54ed2c
+- name: github.com/go-sql-driver/mysql
+  version: 1a676ac6e4dce68e9303a1800773861350374a9e
+- name: github.com/go-xorm/builder
+  version: 488224409dd8aa2ce7a5baf8d10d55764a913738
+- name: github.com/go-xorm/core
+  version: 49b899949a1f54eb9e880bf39dfcdca3864a7ed3
+- name: github.com/go-xorm/xorm
+  version: 11743c1a80897b0fdbf79d88ebcaa7dd5f9d3cf3
+- name: github.com/gogo/protobuf
+  version: 49944b4a4b085da44c43d4b233ea40787396371f
+  subpackages:
+  - gogoproto
+  - proto
+  - protoc-gen-gogo/descriptor
+- name: github.com/golang/protobuf
+  version: bbd03ef6da3a115852eaf24c8a1c46aeb39aa175
+  subpackages:
+  - proto
+  - ptypes
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/timestamp
+- name: github.com/gorilla/websocket
+  version: eb925808374e5ca90c83401a40d711dc08c0c0f6
+- name: github.com/minio/minio-go
+  version: 6807cf184b53db289809cb4a7e4bf17939d870c6
+  subpackages:
+  - pkg/credentials
+  - pkg/encrypt
+  - pkg/policy
+  - pkg/s3signer
+  - pkg/s3utils
+  - pkg/set
+- name: github.com/mitchellh/go-homedir
+  version: b8bc1bf767474819792c23f32d8286a45736f1c6
+- name: github.com/satori/go.uuid
+  version: 36e9d2ebbde5e3f13ab2e25625fd453271d6522e
+- name: github.com/takama/daemon
+  version: fbd475b4742721d59947ac754398130dd5cb9ced
+- name: golang.org/x/crypto
+  version: 80db560fac1fb3e6ac81dbc7f8ae4c061f5257bd
+  subpackages:
+  - argon2
+  - blake2b
+  - curve25519
+  - ed25519
+  - ed25519/internal/edwards25519
+  - internal/chacha20
+  - poly1305
+  - ssh
+- name: golang.org/x/net
+  version: 6078986fec03a1dcc236c34816c71b0e05018fda
+  subpackages:
+  - context
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - lex/httplex
+  - trace
+- name: golang.org/x/text
+  version: 8c34f848e18c4bd34d02db7f19a0ed1a0a8f5852
+  subpackages:
+  - secure/bidirule
+  - transform
+  - unicode/bidi
+  - unicode/norm
+- name: google.golang.org/appengine
+  version: 5bee14b453b4c71be47ec1781b0fa61c2ea182db
+  subpackages:
+  - cloudsql
+- name: google.golang.org/genproto
+  version: f8c8703595236ae70fdf8789ecb656ea0bcdcf46
+  subpackages:
+  - googleapis/rpc/status
+- name: google.golang.org/grpc
+  version: dfbefc6795cd46d1b52c409c02bcd4230fbf8cfd
+  subpackages:
+  - balancer
+  - balancer/base
+  - balancer/roundrobin
+  - codes
+  - connectivity
+  - credentials
+  - encoding
+  - encoding/proto
+  - grpclb/grpc_lb_v1/messages
+  - grpclog
+  - health/grpc_health_v1
+  - internal
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - resolver
+  - resolver/dns
+  - resolver/passthrough
+  - stats
+  - status
+  - tap
+  - transport
+- name: gopkg.in/yaml.v2
+  version: 7f97868eec74b32b0982dd158a51a446d1da7eb5
+testImports: []

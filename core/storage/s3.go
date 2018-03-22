@@ -1,10 +1,10 @@
 package storage
 
 import (
-	"net/url"
-	"time"
-	"strings"
 	"net"
+	"net/url"
+	"strings"
+	"time"
 
 	log "github.com/astaxie/beego/logs"
 	"github.com/minio/minio-go"
@@ -17,22 +17,22 @@ type S3Storage struct {
 	Bucket string
 }
 
-func NewS3Storage(url,key,secret,bucket string)(*S3Storage,error) {
-	s3:=new(S3Storage)
+func NewS3Storage(url, key, secret, bucket string) (*S3Storage, error) {
+	s3 := new(S3Storage)
 	s3.URL = url
 	s3.Key = key
 	s3.Secret = secret
 	s3.Bucket = bucket
-	return s3,nil
+	return s3, nil
 }
 
-func (s3 *S3Storage)Put(repo *StorageParse) error {
+func (s3 *S3Storage) Put(repo *StorageParse) error {
 	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	_, err=s3Client.FPutObject(s3.Bucket,repo.RemotePath,repo.LocalPath,minio.PutObjectOptions{})
+	_, err = s3Client.FPutObject(s3.Bucket, repo.RemotePath, repo.LocalPath, minio.PutObjectOptions{})
 	if err != nil {
 		log.Error(err)
 		return err
@@ -40,7 +40,7 @@ func (s3 *S3Storage)Put(repo *StorageParse) error {
 	return nil
 }
 
-func (s3 *S3Storage)Get(repo *StorageParse) error {
+func (s3 *S3Storage) Get(repo *StorageParse) error {
 	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
 	if err != nil {
 		log.Error(err)
@@ -55,7 +55,7 @@ func (s3 *S3Storage)Get(repo *StorageParse) error {
 	return nil
 }
 
-func (s3 *S3Storage)Delete(repo *StorageParse) error {
+func (s3 *S3Storage) Delete(repo *StorageParse) error {
 	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
 	if err != nil {
 		log.Error(err)
@@ -69,11 +69,11 @@ func (s3 *S3Storage)Delete(repo *StorageParse) error {
 	return nil
 }
 
-func (s3 *S3Storage)Share(repo *StorageParse) (string, error) {
-	addrs:=strings.Split(s3.URL,":")
+func (s3 *S3Storage) Share(repo *StorageParse) (string, error) {
+	addrs := strings.Split(s3.URL, ":")
 	ns, err := net.LookupHost(addrs[0])
-	if err!=nil{
-		return "",err
+	if err != nil {
+		return "", err
 	}
 	s3Client, err := minio.NewV2(ns[0]+":"+addrs[1], s3.Key, s3.Secret, false)
 	if err != nil {

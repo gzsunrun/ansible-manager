@@ -1,21 +1,21 @@
 package function
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
-	"encoding/json"
 
 	log "github.com/astaxie/beego/logs"
-	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/ghodss/yaml"
+	"github.com/gzsunrun/ansible-manager/core/orm"
 )
 
-
-func ReadVars(filePath string ,repo *orm.RepositoryInsert) error{
+// ReadVars fetch vars from repo
+func ReadVars(filePath string, repo *orm.RepositoryInsert) error {
 	dir := filePath + "_dir"
 	err := os.MkdirAll(dir, 0664)
 	if err != nil {
@@ -26,7 +26,7 @@ func ReadVars(filePath string ,repo *orm.RepositoryInsert) error{
 	err = cmd.Run()
 	if err != nil {
 		log.Error(err)
-		return  err
+		return err
 	}
 	groupY, err := ioutil.ReadFile(dir + "/group.yml")
 	if err != nil {
@@ -39,7 +39,7 @@ func ReadVars(filePath string ,repo *orm.RepositoryInsert) error{
 		return err
 	}
 	var groupMap []map[string]interface{}
-	err =json.Unmarshal(group,&groupMap)
+	err = json.Unmarshal(group, &groupMap)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -56,21 +56,21 @@ func ReadVars(filePath string ,repo *orm.RepositoryInsert) error{
 		return err
 	}
 	var tagMap []map[string]interface{}
-	err =json.Unmarshal(tag,&tagMap)
+	err = json.Unmarshal(tag, &tagMap)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 	repo.Tag = tagMap
-	repo.Note="暂无简介"
+	repo.Note = "暂无简介"
 	_, err = os.Stat(dir + "/notes.md")
 	if err == nil || os.IsExist(err) {
 		notes, err := ioutil.ReadFile(dir + "/notes.md")
 		if err != nil {
 			log.Error(err)
-			return  err
+			return err
 		}
-		repo.Note=string(notes)
+		repo.Note = string(notes)
 	}
 
 	_, err = os.Stat(dir + "/info.yml")
@@ -78,13 +78,13 @@ func ReadVars(filePath string ,repo *orm.RepositoryInsert) error{
 		info, err := ioutil.ReadFile(dir + "/info.yml")
 		if err != nil {
 			log.Error(err)
-			return  err
+			return err
 		}
 
-		err=yaml.Unmarshal(info,repo)
+		err = yaml.Unmarshal(info, repo)
 		if err != nil {
 			log.Error(err)
-			return  err
+			return err
 		}
 	}
 	varsPaths, err := getFilelist(dir + "/vars")
@@ -94,36 +94,36 @@ func ReadVars(filePath string ,repo *orm.RepositoryInsert) error{
 	}
 	vars := make([]orm.Vars, 0)
 	for _, fpath := range varsPaths {
-		if strings.HasSuffix(fpath,"_struct.yml"){
+		if strings.HasSuffix(fpath, "_struct.yml") {
 			continue
 		}
 		vals := orm.Vars{}
 		val, err := ioutil.ReadFile(fpath)
 		if err != nil {
 			log.Error(err)
-			return  err
+			return err
 		}
 		distr, file := filepath.Split(fpath)
 		vals.Name = strings.Replace(file, path.Ext(file), "", -1)
 		vals.Path = strings.Replace(fpath, dir+"/", "", -1)
-		valJson,err:=yaml.YAMLToJSON(val)
+		valJSON, err := yaml.YAMLToJSON(val)
 		if err != nil {
 			log.Error(err)
 			return err
 		}
-		vStruct, err := ioutil.ReadFile(distr+"/"+vals.Name +"_struct.yml")
+		vStruct, err := ioutil.ReadFile(distr + "/" + vals.Name + "_struct.yml")
 		if err != nil {
 			log.Error(err)
 			return err
 		}
-		structJson,err:=yaml.YAMLToJSON(vStruct)
+		structJSON, err := yaml.YAMLToJSON(vStruct)
 		if err != nil {
 			log.Error(err)
 			return err
 		}
-		varsStr :=`{"vars":`+string(valJson)+`,"struct":`+string(structJson)+`}`
-		varsV :=orm.VarsValue{}
-		err =json.Unmarshal([]byte(varsStr),&varsV)
+		varsStr := `{"vars":` + string(valJSON) + `,"struct":` + string(structJSON) + `}`
+		varsV := orm.VarsValue{}
+		err = json.Unmarshal([]byte(varsStr), &varsV)
 		if err != nil {
 			log.Error(err)
 			return err
@@ -136,6 +136,7 @@ func ReadVars(filePath string ,repo *orm.RepositoryInsert) error{
 	return nil
 }
 
+// getFilelist walk a dir
 func getFilelist(fpath string) ([]string, error) {
 	paths := make([]string, 0)
 	err := filepath.Walk(fpath, func(path string, f os.FileInfo, err error) error {

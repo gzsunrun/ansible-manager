@@ -1,0 +1,28 @@
+package: github.com/gzsunrun/ansible-manager
+homepage: https://github.com/gzsunrun/ansible-manager
+license: MIT
+owners:
+- name: hashwing
+  email: hashwing95@gmail.com
+  homepage: https://hashwing.github.io/
+import:
+- package: github.com/astaxie/beego
+  subpackages:
+  - context
+  - logs
+  - plugins/cors
+- package: github.com/coreos/etcd
+  subpackages:
+  - clientv3
+- package: github.com/dgrijalva/jwt-go
+  subpackages:
+  - request
+- package: github.com/ghodss/yaml
+- package: github.com/go-ini/ini
+- package: github.com/go-sql-driver/mysql
+- package: github.com/go-xorm/xorm
+- package: github.com/gorilla/websocket
+- package: github.com/minio/minio-go
+- package: github.com/satori/go.uuid
+- package: github.com/takama/daemon
+- package: golang.org/x/crypto/ssh

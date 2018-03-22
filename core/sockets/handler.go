@@ -116,7 +116,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	h.register <- c
 
-
 	go c.writePump()
 	go Client(taskID)
 	c.readPump()
@@ -131,10 +130,10 @@ func Message(taskID string, message []byte) {
 }
 
 // 断开连接
-func CloseConn(taskID string){
+func CloseConn(taskID string) {
 	for c := range h.connections {
-		if c.taskID==taskID{
-			h.unregister<-c
+		if c.taskID == taskID {
+			h.unregister <- c
 			c.ws.Close()
 		}
 	}

@@ -6,15 +6,17 @@ import (
 	log "github.com/astaxie/beego/logs"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/function"
-	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/orm"
+	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/satori/go.uuid"
 )
 
+// RepoController repo controller
 type RepoController struct {
 	BaseController
 }
 
+// List get repo list
 func (c *RepoController) List() {
 	defer c.ServeJSON()
 	var repos []orm.RepositoryList
@@ -26,13 +28,14 @@ func (c *RepoController) List() {
 	c.SetResult(nil, repos, 200)
 }
 
+// Create create repo
 func (c *RepoController) Create() {
 	defer c.ServeJSON()
 	repo := orm.RepositoryInsert{}
-	repo.ID= uuid.Must(uuid.NewV4()).String()
+	repo.ID = uuid.Must(uuid.NewV4()).String()
 	f, _, err := c.GetFile("repo_path")
 	if err != nil {
-		log.Error("Getfile",err)
+		log.Error("Getfile", err)
 		c.SetResult(err, nil, 400)
 		return
 	}
@@ -47,22 +50,22 @@ func (c *RepoController) Create() {
 	}
 	defer os.Remove(config.Cfg.Common.WorkPath + "/" + repoPath)
 	defer os.RemoveAll(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir")
-	err = function.ReadVars(config.Cfg.Common.WorkPath + "/" + repoPath,&repo)
+	err = function.ReadVars(config.Cfg.Common.WorkPath+"/"+repoPath, &repo)
 	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	if c.GetString("repo_name")!=""{
-		repo.Name=c.GetString("repo_name")
+	if c.GetString("repo_name") != "" {
+		repo.Name = c.GetString("repo_name")
 	}
-	if c.GetString("repo_desc")!=""{
-		repo.Desc=c.GetString("repo_desc")
+	if c.GetString("repo_desc") != "" {
+		repo.Desc = c.GetString("repo_desc")
 	}
 	_, err = os.Stat(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo.png")
 	if err == nil || os.IsExist(err) {
-		logoParse:=storage.StorageParse{
-			LocalPath:config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo.png",
-			RemotePath:repoPath+".png",
+		logoParse := storage.StorageParse{
+			LocalPath:  config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo.png",
+			RemotePath: repoPath + ".png",
 		}
 		err = storage.Storage.Put(&logoParse)
 		if err != nil {
@@ -70,9 +73,9 @@ func (c *RepoController) Create() {
 			return
 		}
 	}
-	repoParse:=storage.StorageParse{
-		LocalPath:config.Cfg.Common.WorkPath + "/" + repoPath,
-		RemotePath:repoPath,
+	repoParse := storage.StorageParse{
+		LocalPath:  config.Cfg.Common.WorkPath + "/" + repoPath,
+		RemotePath: repoPath,
 	}
 	err = storage.Storage.Put(&repoParse)
 	if err != nil {
@@ -87,10 +90,11 @@ func (c *RepoController) Create() {
 	c.SetResult(nil, nil, 204)
 }
 
+// Delete delete a repo
 func (c *RepoController) Delete() {
 	repoID := c.GetString("repo_id")
 	var repo orm.Repository
-	err := orm.GetRepoByID(repoID,&repo)
+	err := orm.GetRepoByID(repoID, &repo)
 	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
@@ -100,52 +104,54 @@ func (c *RepoController) Delete() {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	logoParse:=storage.StorageParse{
-		RemotePath:repo.Path+".png",
+	logoParse := storage.StorageParse{
+		RemotePath: repo.Path + ".png",
 	}
-	repoParse:=storage.StorageParse{
-		RemotePath:repo.Path,
+	repoParse := storage.StorageParse{
+		RemotePath: repo.Path,
 	}
 	storage.Storage.Delete(&logoParse)
 	storage.Storage.Delete(&repoParse)
 	c.SetResult(nil, nil, 204)
 }
 
-func (c *RepoController) Vars(){
+// Vars get repo vars
+func (c *RepoController) Vars() {
 	defer c.ServeJSON()
-	rid:=c.GetString("repo_id")
+	rid := c.GetString("repo_id")
 	var repo orm.Repository
-	err:=orm.GetRepoByID(rid,&repo)
+	err := orm.GetRepoByID(rid, &repo)
 	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	data :=map[string]interface{}{
-		"vars": repo.Vars,
+	data := map[string]interface{}{
+		"vars":  repo.Vars,
 		"group": repo.Group,
-		"tag": repo.Tag,
+		"tag":   repo.Tag,
 	}
-	c.SetResult(nil,data,200)
+	c.SetResult(nil, data, 200)
 }
 
-func (c *RepoController) SyncGit(){
+// SyncGit clone repo from git
+func (c *RepoController) SyncGit() {
 	repo := orm.RepositoryInsert{}
-	repo.ID= uuid.Must(uuid.NewV4()).String()
-	repo.Path=c.GetString("git_url")
-	repoPath:=uuid.Must(uuid.NewV4()).String()
-	repoParse:=storage.StorageParse{
-		RemotePath:repo.Path,
-		LocalPath:config.Cfg.Common.WorkPath + "/" + repoPath,
+	repo.ID = uuid.Must(uuid.NewV4()).String()
+	repo.Path = c.GetString("git_url")
+	repoPath := uuid.Must(uuid.NewV4()).String()
+	repoParse := storage.StorageParse{
+		RemotePath: repo.Path,
+		LocalPath:  config.Cfg.Common.WorkPath + "/" + repoPath,
 	}
-	err:=storage.Storage.Get(&repoParse)
-	if err!=nil{
+	err := storage.Storage.Get(&repoParse)
+	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
 	}
 
 	defer os.Remove(config.Cfg.Common.WorkPath + "/" + repoPath)
 	defer os.RemoveAll(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir")
-	err = function.ReadVars(config.Cfg.Common.WorkPath + "/" + repoPath,&repo)
+	err = function.ReadVars(config.Cfg.Common.WorkPath+"/"+repoPath, &repo)
 	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
@@ -158,11 +164,13 @@ func (c *RepoController) SyncGit(){
 	c.SetResult(nil, nil, 204)
 }
 
+// StorageType get the type of storage
 func (c *RepoController) StorageType() {
 	defer c.ServeJSON()
-	c.SetResult(nil, config.Cfg.Git.Enable, 200,"status")
+	c.SetResult(nil, config.Cfg.Git.Enable, 200, "status")
 }
 
+// Health check health
 func (c *RepoController) Health() {
 	c.Data["json"] = map[string]interface{}{"health": "ok"}
 	c.ServeJSON()

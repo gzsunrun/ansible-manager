@@ -1,12 +1,12 @@
 package orm
 
 import (
-	"errors"
 	"crypto/rand"
-	"encoding/pem"
+	"crypto/rsa"
 	"crypto/x509"
-    "crypto/rsa"
-    "encoding/base64"
+	"encoding/base64"
+	"encoding/pem"
+	"errors"
 )
 
 var privateKey = []byte(`-----BEGIN RSA PRIVATE KEY-----
@@ -24,7 +24,7 @@ DAcwLSJoctiODQ1Fq9rreDE5QfpJnaJdJfsIJNtX1F+L3YceeBXtW0Ynz2MCQBI8
 DPwqA3N5TMNDQVGv8gMCQQCaKGJgWYgvo3/milFfImbp+m7/Y3vCptarldXrYQWO
 AQjxwc71ZGBFDITYvdgJM1MTqc8xQek1FXn1vfpy2c6O
 -----END RSA PRIVATE KEY-----`)
-	 
+
 var publicKey = []byte(`-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZsfv1qscqYdy4vY+P4e3cAtmv
 ppXQcRvrF1cB4drkv0haU24Y7m5qYtT52Kr539RdbKKdLAM6s20lWy7+5C0Dgacd
@@ -33,32 +33,32 @@ AUeJ6PeW+DAkmJWF6QIDAQAB
 -----END PUBLIC KEY-----`)
 
 func RsaEncrypt(origData []byte) (string, error) {
-    block, _ := pem.Decode(publicKey)
-    if block == nil {
-        return "", errors.New("public key error")
-    }
-    pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
-    if err != nil {
-        return "", err
-    }
-    pub := pubInterface.(*rsa.PublicKey)
-    data,err:=rsa.EncryptPKCS1v15(rand.Reader, pub, origData)
-    return base64.StdEncoding.EncodeToString(data),err
+	block, _ := pem.Decode(publicKey)
+	if block == nil {
+		return "", errors.New("public key error")
+	}
+	pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return "", err
+	}
+	pub := pubInterface.(*rsa.PublicKey)
+	data, err := rsa.EncryptPKCS1v15(rand.Reader, pub, origData)
+	return base64.StdEncoding.EncodeToString(data), err
 }
 
 func RsaDecrypt(src string) (string, error) {
-    block, _ := pem.Decode(privateKey)
-    if block == nil {
-        return "", errors.New("private key error!")
-    }
-    priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-    if err != nil {
-        return "", err
-    }
-    ciphertext,err:=base64.StdEncoding.DecodeString(src)
-    if err != nil {
-        return "", err
-    }
-    data,err:=rsa.DecryptPKCS1v15(rand.Reader, priv, ciphertext)
-    return string(data),err
+	block, _ := pem.Decode(privateKey)
+	if block == nil {
+		return "", errors.New("private key error!")
+	}
+	priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return "", err
+	}
+	ciphertext, err := base64.StdEncoding.DecodeString(src)
+	if err != nil {
+		return "", err
+	}
+	data, err := rsa.DecryptPKCS1v15(rand.Reader, priv, ciphertext)
+	return string(data), err
 }

@@ -14,6 +14,7 @@ type Service struct {
 	daemon.Daemon
 }
 
+// DaemonRoutine ...
 type DaemonRoutine func()
 
 var stdlog, errlog *log.Logger
@@ -69,6 +70,7 @@ func (service *Service) Manage(callback DaemonRoutine) (string, error) {
 	return usage, nil
 }
 
+// BackGroundService run in background 
 func BackGroundService(name, description string, dependencies []string, callback DaemonRoutine) string {
 	srv, err := daemon.New(name, description, dependencies...)
 	if err != nil {

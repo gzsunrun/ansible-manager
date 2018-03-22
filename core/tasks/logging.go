@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"os/exec"
 
-	"github.com/gzsunrun/ansible-manager/core/orm"
-	"github.com/gzsunrun/ansible-manager/core/sockets"
-	"github.com/gzsunrun/ansible-manager/core/output"
 	log "github.com/astaxie/beego/logs"
+	"github.com/gzsunrun/ansible-manager/core/orm"
+	"github.com/gzsunrun/ansible-manager/core/output"
+	"github.com/gzsunrun/ansible-manager/core/sockets"
 )
 
 type Task struct {
-	Desc   	orm.Task
-	LO 		output.LogOutput
+	Desc orm.Task
+	LO   output.LogOutput
 }
 
 func (t *Task) log(msg string) {
@@ -63,4 +63,3 @@ func (t *Task) logCmd(cmd *exec.Cmd) {
 	go t.logPipe(bufio.NewScanner(stderr))
 	go t.logPipe(bufio.NewScanner(stdout))
 }
-

@@ -8,8 +8,8 @@ import (
 )
 
 // SetLog config log path
-func SetLog(path string)error{
-	err:=os.MkdirAll(filepath.Dir(path),0664)
+func SetLog(path string) error {
+	err := os.MkdirAll(filepath.Dir(path), 0664)
 	if err != nil {
 		logs.Error("fail to create log dir")
 		return err

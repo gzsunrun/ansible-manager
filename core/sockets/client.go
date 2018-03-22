@@ -5,31 +5,31 @@ import (
 	"time"
 
 	log "github.com/astaxie/beego/logs"
-	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gorilla/websocket"
+	"github.com/gzsunrun/ansible-manager/core/kv"
 )
 
-var WsChan =make(map[string]chan bool)
+var WsChan = make(map[string]chan bool)
 
-func Client(taskID string){
-	if WsChan[taskID]!=nil{
+func Client(taskID string) {
+	if WsChan[taskID] != nil {
 		return
 	}
-	WsChan[taskID]=make(chan bool)
-	defer func(){
-		WsChan[taskID]=nil
+	WsChan[taskID] = make(chan bool)
+	defer func() {
+		WsChan[taskID] = nil
 	}()
-	nodeID :=kv.DefaultClient.GetStorage().Tasks[taskID].NodeID
-	if nodeID==kv.DefaultClient.LocalNode().ID(){
+	nodeID := kv.DefaultClient.GetStorage().Tasks[taskID].NodeID
+	if nodeID == kv.DefaultClient.LocalNode().ID() {
 		return
 	}
-	ip :=kv.DefaultClient.GetStorage().Nodes[nodeID].IP
-	port:=kv.DefaultClient.GetStorage().Nodes[nodeID].Port
-	path:=kv.DefaultClient.GetStorage().Nodes[nodeID].Path
-	if ip==""{
-		return 
+	ip := kv.DefaultClient.GetStorage().Nodes[nodeID].IP
+	port := kv.DefaultClient.GetStorage().Nodes[nodeID].Port
+	path := kv.DefaultClient.GetStorage().Nodes[nodeID].Path
+	if ip == "" {
+		return
 	}
-	addr:=fmt.Sprintf("ws://%s:%d%s%s",ip,port,path,"?task_id="+taskID)
+	addr := fmt.Sprintf("ws://%s:%d%s%s", ip, port, path, "?task_id="+taskID)
 	log.Info(addr)
 	c, _, err := websocket.DefaultDialer.Dial(addr, nil)
 	if err != nil {
@@ -48,7 +48,7 @@ func Client(taskID string){
 				log.Error("read:", err)
 				return
 			}
-			Message(taskID,message)
+			Message(taskID, message)
 		}
 	}()
 
@@ -64,7 +64,7 @@ func Client(taskID string){
 				log.Error("write close:", err)
 				return
 			}
-			
+
 			select {
 			case <-done:
 			case <-time.After(time.Second):
@@ -74,9 +74,9 @@ func Client(taskID string){
 	}
 }
 
-func StopClient(taskID string){
-	if WsChan[taskID]==nil{
+func StopClient(taskID string) {
+	if WsChan[taskID] == nil {
 		return
 	}
-	WsChan[taskID]<-true
+	WsChan[taskID] <- true
 }
