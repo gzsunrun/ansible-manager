@@ -9,6 +9,7 @@ var node = func(n kv.Node, p bool) {}
 var task = func(t kv.Task, p bool) {}
 var sche = func(t kv.Task, p bool) {}
 
+// Run run role
 func Run() {
 	if config.Cfg.Common.Master {
 		MasterSet()

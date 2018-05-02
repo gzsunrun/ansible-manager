@@ -7,6 +7,7 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/tasks"
 )
 
+// WorkerSet worker config
 func WorkerSet() {
 	task = func(t kv.Task, p bool) {
 		if p {

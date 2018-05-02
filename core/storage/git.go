@@ -8,17 +8,21 @@ import (
 	log "github.com/astaxie/beego/logs"
 )
 
+// Git git repo
 type Git struct {
 }
 
+// NewGit new git
 func NewGit() *Git {
 	return new(Git)
 }
 
+// Put upload file
 func (g *Git) Put(repo *StorageParse) error {
 	return nil
 }
 
+// Get download file
 func (g *Git) Get(repo *StorageParse) error {
 	localDir := repo.LocalPath + "_git"
 	cmd := exec.Command("git", "clone", repo.RemotePath, localDir)
@@ -35,10 +39,12 @@ func (g *Git) Get(repo *StorageParse) error {
 	return cmd.Run()
 }
 
+// Delete delete file
 func (g *Git) Delete(repo *StorageParse) error {
 	return nil
 }
 
+// Share share file
 func (g *Git) Share(repo *StorageParse) (string, error) {
 	return "", nil
 }

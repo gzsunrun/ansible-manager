@@ -54,6 +54,7 @@ func (h *hub) run() {
 	}
 }
 
+// StartWS start ws listen
 func StartWS() {
 	go h.run()
 }

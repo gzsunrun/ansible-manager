@@ -12,6 +12,7 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/sockets"
 	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/tasks"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/gzsunrun/ansible-manager/routers"
 )
 

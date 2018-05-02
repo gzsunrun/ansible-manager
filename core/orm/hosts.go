@@ -6,6 +6,7 @@ import (
 	log "github.com/astaxie/beego/logs"
 )
 
+// Hosts host table
 type Hosts struct {
 	ID       string    `xorm:"host_id" json:"host_id"`
 	UserID   string    `xorm:"user_id" json:"user_id"`
@@ -19,6 +20,7 @@ type Hosts struct {
 	Created  time.Time `xorm:"created" json:"created"`
 }
 
+// HostsList host json for output
 type HostsList struct {
 	ID       string    `xorm:"host_id" json:"host_id"`
 	UserID   string    `xorm:"user_id" json:"-"`
@@ -32,6 +34,7 @@ type HostsList struct {
 	Created  time.Time `xorm:"created" json:"created"`
 }
 
+// CreateHost insert host into table
 func CreateHost(host *Hosts) error {
 	if host.Password != "" {
 		psw, err := RsaEncrypt([]byte(host.Password))
@@ -56,6 +59,7 @@ func CreateHost(host *Hosts) error {
 	return err
 }
 
+// CreateHostList insert hostlist into table
 func CreateHostList(host *HostsList) error {
 	if host.Password != "" {
 		psw, err := RsaEncrypt([]byte(host.Password))
@@ -80,6 +84,7 @@ func CreateHostList(host *HostsList) error {
 	return err
 }
 
+// UPdateHost update host into table
 func UPdateHost(host *Hosts) error {
 	if host.Password != "" {
 		psw, err := RsaEncrypt([]byte(host.Password))
@@ -103,7 +108,7 @@ func UPdateHost(host *Hosts) error {
 	}
 	return err
 }
-
+// UPdateNullHost update host enve if filed is null
 func UPdateNullHost(host *Hosts) error {
 	if host.Password != "" {
 		psw, err := RsaEncrypt([]byte(host.Password))
@@ -130,6 +135,7 @@ func UPdateNullHost(host *Hosts) error {
 	return err
 }
 
+// UPdateAuthHost update and auth host
 func UPdateAuthHost(host *Hosts) error {
 	var err error
 	if host.Password != "" {
@@ -163,6 +169,7 @@ func UPdateAuthHost(host *Hosts) error {
 	return err
 }
 
+// FindHosts find hosts
 func FindHosts(uid string, hosts *[]HostsList) error {
 	err := MysqlDB.Table("ansible_host").Where("user_id=?", uid).Find(hosts)
 	if err != nil {
@@ -182,6 +189,7 @@ func FindHosts(uid string, hosts *[]HostsList) error {
 	return nil
 }
 
+// GetHost get host
 func GetHost(hostID string, host interface{}) (bool, error) {
 	res, err := MysqlDB.Table("ansible_host").Where("host_id=?", hostID).Get(host)
 	if err != nil {
@@ -215,6 +223,7 @@ func GetHost(hostID string, host interface{}) (bool, error) {
 	return res, err
 }
 
+// DelHost delete host
 func DelHost(hid string) error {
 	host := new(Hosts)
 	_, err := MysqlDB.Table("ansible_host").Where("host_id=?", hid).Delete(host)

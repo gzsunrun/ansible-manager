@@ -22,6 +22,7 @@ var (
 	schedulersPath string
 )
 
+// EtcdClient etcd client
 type EtcdClient struct {
 	client     *clientv3.Client
 	reqTimeout time.Duration
@@ -33,6 +34,7 @@ type EtcdClient struct {
 	scheCall   func(Task, bool)
 }
 
+// NewEtcd new etcd client
 func NewEtcd(endpoints []string, ttl int64, port int, path string, worker, master bool) (*EtcdClient, error) {
 	cfg := clientv3.Config{
 		Endpoints:   endpoints,
@@ -66,17 +68,18 @@ func NewEtcd(endpoints []string, ttl int64, port int, path string, worker, maste
 	}, nil
 }
 
-// get this node info
+// LocalNode get this node info
 func (ec *EtcdClient) LocalNode() *Node {
 	return ec.Node
 }
 
-//del all task
+// DelAllTask del all task
 func (ec *EtcdClient) DelAllTask() error {
 	_, err := ec.Delete(tasksPath, clientv3.WithPrefix())
 	return err
 }
 
+// AddTask add task
 func (ec *EtcdClient) AddTask(task Task) error {
 	key := fmt.Sprint(tasksPath, task.ID)
 	val, err := json.Marshal(task)
@@ -100,15 +103,18 @@ func (ec *EtcdClient) AddTask(task Task) error {
 	return err
 }
 
+// DeleteTask delete task
 func (ec *EtcdClient) DeleteTask(tid string) error {
 	_, err := ec.Delete(tasksPath + tid)
 	return err
 }
 
+// GetStorage get storage
 func (ec *EtcdClient) GetStorage() *LocalMenory {
 	return ec.Storage
 }
 
+// AddScheduler add  scheduler
 func (ec *EtcdClient) AddScheduler(task Task) error {
 	key := fmt.Sprint(schedulersPath, task.ID)
 	val, err := json.Marshal(task)
@@ -120,11 +126,13 @@ func (ec *EtcdClient) AddScheduler(task Task) error {
 	return err
 }
 
+// DeleteScheduler delete scheduler
 func (ec *EtcdClient) DeleteScheduler(tid string) error {
 	_, err := ec.Delete(schedulersPath + tid)
 	return err
 }
 
+// SetCall set call function
 func (ec *EtcdClient) SetCall(node func(Node, bool), task, sche func(Task, bool)) {
 	ec.taskCall = task
 	ec.nodeCall = node
@@ -132,6 +140,7 @@ func (ec *EtcdClient) SetCall(node func(Node, bool), task, sche func(Task, bool)
 	go ec.WatchData()
 }
 
+// SyncData sync data from etcd
 func (ec *EtcdClient) SyncData() error {
 	var nodes []Node
 	err := ec.FindNodes(&nodes)
@@ -156,6 +165,7 @@ func (ec *EtcdClient) SyncData() error {
 
 }
 
+// FindTasks find all tasks
 func (ec *EtcdClient) FindTasks(tasks interface{}) error {
 	grsp, err := ec.Get(tasksPath, clientv3.WithPrefix())
 	if err != nil {
@@ -173,6 +183,7 @@ func (ec *EtcdClient) FindTasks(tasks interface{}) error {
 	return err
 }
 
+// RegNode reg node into etcd
 func (ec *EtcdClient) RegNode() error {
 	lrsp, err := ec.Grant(ec.Node.OutTime() + 2)
 	ec.lID = lrsp.ID
@@ -180,11 +191,13 @@ func (ec *EtcdClient) RegNode() error {
 	return err
 }
 
+// DelNode delete node
 func (ec *EtcdClient) DelNode() error {
 	_, err := ec.Delete(nodesPath + ec.Node.ID())
 	return err
 }
 
+// FindNodes find all nodes
 func (ec *EtcdClient) FindNodes(nodes interface{}) error {
 	grsp, err := ec.Get(nodesPath, clientv3.WithPrefix())
 	if err != nil {
@@ -201,6 +214,8 @@ func (ec *EtcdClient) FindNodes(nodes interface{}) error {
 	err = json.Unmarshal([]byte(str), nodes)
 	return err
 }
+
+// GetNode get node
 func (ec *EtcdClient) GetNode(node interface{}, id string) error {
 	grsp, err := ec.Get(nodesPath + id)
 	if err != nil {
@@ -214,6 +229,7 @@ func (ec *EtcdClient) GetNode(node interface{}, id string) error {
 	return nil
 }
 
+// WatchData watch key when put or delete
 func (ec *EtcdClient) WatchData() {
 	wch := ec.Watch(rootPath, clientv3.WithPrefix())
 	for {
@@ -278,6 +294,7 @@ func (ec *EtcdClient) WatchData() {
 	}
 }
 
+// KeepNode keep node
 func (ec *EtcdClient) KeepNode() {
 	duration := time.Duration(ec.Node.TTL) * time.Second
 	timer := time.NewTimer(duration)
@@ -303,40 +320,47 @@ func (ec *EtcdClient) KeepNode() {
 	}
 }
 
+// Put etcd put
 func (ec *EtcdClient) Put(key, val string, opts ...clientv3.OpOption) (*clientv3.PutResponse, error) {
 	ctx, cancel := NewEtcdTimeoutContext(ec)
 	defer cancel()
 	return ec.client.Put(ctx, key, val, opts...)
 }
 
+// Get etcd get
 func (ec *EtcdClient) Get(key string, opts ...clientv3.OpOption) (*clientv3.GetResponse, error) {
 	ctx, cancel := NewEtcdTimeoutContext(ec)
 	defer cancel()
 	return ec.client.Get(ctx, key, opts...)
 }
 
+// Delete etcd delete
 func (ec *EtcdClient) Delete(key string, opts ...clientv3.OpOption) (*clientv3.DeleteResponse, error) {
 	ctx, cancel := NewEtcdTimeoutContext(ec)
 	defer cancel()
 	return ec.client.Delete(ctx, key, opts...)
 }
 
+// Grant etcd grant
 func (ec *EtcdClient) Grant(ttl int64) (*clientv3.LeaseGrantResponse, error) {
 	ctx, cancel := NewEtcdTimeoutContext(ec)
 	defer cancel()
 	return ec.client.Grant(ctx, ttl)
 }
 
+// Watch etcd watch
 func (ec *EtcdClient) Watch(key string, opts ...clientv3.OpOption) clientv3.WatchChan {
 	return ec.client.Watch(context.Background(), key, opts...)
 }
 
+// KeepAliveOnce keepalive one time
 func (ec *EtcdClient) KeepAliveOnce(id clientv3.LeaseID) (*clientv3.LeaseKeepAliveResponse, error) {
 	ctx, cancel := NewEtcdTimeoutContext(ec)
 	defer cancel()
 	return ec.client.KeepAliveOnce(ctx, id)
 }
 
+// GetLock get lock
 func (ec *EtcdClient) GetLock(key string, id clientv3.LeaseID) (bool, error) {
 	key = locksPath + key
 	ctx, cancel := NewEtcdTimeoutContext(ec)
@@ -353,17 +377,20 @@ func (ec *EtcdClient) GetLock(key string, id clientv3.LeaseID) (bool, error) {
 	return resp.Succeeded, nil
 }
 
+// DelLock delete lock
 func (ec *EtcdClient) DelLock(key string) error {
 	_, err := ec.Delete(locksPath + key)
 	return err
 }
 
+// etcdTimeoutContext etcd timeout context
 type etcdTimeoutContext struct {
 	context.Context
 
 	etcdEndpoints []string
 }
 
+// Err err
 func (c *etcdTimeoutContext) Err() error {
 	err := c.Context.Err()
 	if err == context.DeadlineExceeded {
@@ -372,7 +399,7 @@ func (c *etcdTimeoutContext) Err() error {
 	}
 	return err
 }
-
+// NewEtcdTimeoutContext new etcd timeout context
 func NewEtcdTimeoutContext(c *EtcdClient) (context.Context, context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.reqTimeout)
 	etcdCtx := &etcdTimeoutContext{}

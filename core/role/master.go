@@ -6,6 +6,7 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/orm"
 )
 
+// MasterSet master config
 func MasterSet() {
 	node = func(n kv.Node, p bool) {
 		if !p {
@@ -34,6 +35,7 @@ func MasterSet() {
 	CleanTask()
 }
 
+// Scheduler scheduler 
 func Scheduler(n map[string]kv.Node, t map[string]kv.Task) string {
 	if len(n) == 0 {
 		return ""
@@ -93,6 +95,7 @@ func Scheduler(n map[string]kv.Node, t map[string]kv.Task) string {
 	return nodes[0]
 }
 
+// CleanTask clean task die
 func CleanTask() {
 	for taskID, t := range kv.DefaultClient.GetStorage().Tasks {
 		flag := true
@@ -127,6 +130,7 @@ func CleanTask() {
 	}
 }
 
+// CommitTask commit task
 func CommitTask(task kv.Task) {
 	nodeID := Scheduler(kv.DefaultClient.GetStorage().Nodes, kv.DefaultClient.GetStorage().Tasks)
 	if nodeID == "" {

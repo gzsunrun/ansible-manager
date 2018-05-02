@@ -37,7 +37,7 @@ type connection struct {
 	taskID string
 }
 
-// 从连接中读信息
+// readPump 从连接中读信息
 func (c *connection) readPump() {
 	defer func() {
 		h.unregister <- c
@@ -69,7 +69,7 @@ func (c *connection) write(mt int, payload []byte) error {
 	return c.ws.WriteMessage(mt, payload)
 }
 
-// 从连接中写信息
+// writePump 从连接中写信息
 func (c *connection) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 
@@ -96,7 +96,7 @@ func (c *connection) writePump() {
 	}
 }
 
-//建立websocket 连接
+//Handler 建立websocket 连接
 func Handler(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -121,7 +121,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	c.readPump()
 }
 
-// 往广播信息队列中写信息
+// Message 往广播信息队列中写信息
 func Message(taskID string, message []byte) {
 	h.broadcast <- &sendRequest{
 		taskID: taskID,
@@ -129,7 +129,7 @@ func Message(taskID string, message []byte) {
 	}
 }
 
-// 断开连接
+// CloseConn 断开连接
 func CloseConn(taskID string) {
 	for c := range h.connections {
 		if c.taskID == taskID {

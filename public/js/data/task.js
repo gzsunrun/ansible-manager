@@ -413,21 +413,44 @@ function createInvJSON(){
 }
 
 function createVarsView(){
-	$("#playbook-parse").empty()
+	$("#parse").empty()
 	
-	 $.each(TASKVARS.task_vars,function(i,v){
-		$("#playbook-parse").append( `
-		<div class="form-group">
-			<label for="playbook-value" class="col-sm-2">`+v.vars_name+`</label>
-			<div class="col-md-9 col-sm-10">
-				<div id="editor-`+i+`" class="json-editor"></div>  
-			</div>
+	//  $.each(TASKVARS.task_vars,function(i,v){
+	// 	$("#playbook-parse").append( `
+	// 	<div class="form-group">
+	// 		<label for="playbook-value" class="col-sm-2">`+v.vars_name+`</label>
+	// 		<div class="col-md-9 col-sm-10">
+	// 			<div id="editor-`+i+`" class="json-editor"></div>  
+	// 		</div>
+	// 	</div>`)
+	// 	$('#editor-'+i).jsonEditor(v.vars_value.vars, 
+	// 		{ change: function(msg) {  
+	// 			TASKVARS.task_vars[i].vars_value.vars=msg 
+	// 		}
+ 	// 	}); 
+	// })
+
+	var JsonM=new(Array)
+	$.each(TASKVARS.task_vars,function(i,v){
+		$("#parse").append( `
+			<div id="editor2-`+i+`" class="json-editor"></div> 
 		</div>`)
-		$('#editor-'+i).jsonEditor(v.vars_value.vars, 
-			{ change: function(msg) {  
-				TASKVARS.task_vars[i].vars_value.vars=msg 
-			}
- 		}); 
+		var editor2 = new JSONEditor(document.getElementById('editor2-'+i),{
+			schema: {
+			  type: "object",
+			  title: v.vars_name,
+			  properties: v.vars_value.struct
+			},
+			startval: v.vars_value.vars,
+			theme: 'bootstrap3',
+			disable_edit_json:true,
+			disable_properties:true,
+			iconlib:"fontawesome3"
+		  });
+		  JsonM[i]=editor2
+		  JsonM[i].on('change',function() {
+			TASKVARS.task_vars[i].vars_value.vars=editor2.getValue()
+		});
 	})
 	
 	// $.each(TASKVARS.task_vars,function(i,v){

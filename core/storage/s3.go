@@ -10,6 +10,7 @@ import (
 	"github.com/minio/minio-go"
 )
 
+// S3Storage s3 repo
 type S3Storage struct {
 	URL    string
 	Key    string
@@ -17,6 +18,7 @@ type S3Storage struct {
 	Bucket string
 }
 
+// NewS3Storage new s3 storage
 func NewS3Storage(url, key, secret, bucket string) (*S3Storage, error) {
 	s3 := new(S3Storage)
 	s3.URL = url
@@ -26,6 +28,7 @@ func NewS3Storage(url, key, secret, bucket string) (*S3Storage, error) {
 	return s3, nil
 }
 
+// Put upload file
 func (s3 *S3Storage) Put(repo *StorageParse) error {
 	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
 	if err != nil {
@@ -40,6 +43,7 @@ func (s3 *S3Storage) Put(repo *StorageParse) error {
 	return nil
 }
 
+// Get download file
 func (s3 *S3Storage) Get(repo *StorageParse) error {
 	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
 	if err != nil {
@@ -55,6 +59,7 @@ func (s3 *S3Storage) Get(repo *StorageParse) error {
 	return nil
 }
 
+// Delete delete file
 func (s3 *S3Storage) Delete(repo *StorageParse) error {
 	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
 	if err != nil {
@@ -69,6 +74,7 @@ func (s3 *S3Storage) Delete(repo *StorageParse) error {
 	return nil
 }
 
+// Share share file
 func (s3 *S3Storage) Share(repo *StorageParse) (string, error) {
 	addrs := strings.Split(s3.URL, ":")
 	ns, err := net.LookupHost(addrs[0])

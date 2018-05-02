@@ -1,7 +1,9 @@
 package function
 
 import (
+	"fmt"
 	"golang.org/x/crypto/ssh"
+	"net"
 	"strings"
 	"time"
 
@@ -48,9 +50,13 @@ func AuthPassword(host orm.HostsList) string {
 		User:    host.User,
 		Auth:    authMethods,
 		Timeout: 3 * time.Second,
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+            return nil
+        },
 	})
 
 	if err != nil {
+		fmt.Println(err)
 		if strings.Contains(err.Error(), "unable to authenticate") {
 			return "auth"
 		}
@@ -73,6 +79,9 @@ func AuthKey(host orm.HostsList) string {
 		User:    host.User,
 		Auth:    []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		Timeout: 3 * time.Second,
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+            return nil
+        },
 	})
 
 	if err != nil {
@@ -95,6 +104,9 @@ func AuthKeyByHost(host orm.Hosts) string {
 		User:    host.User,
 		Auth:    []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		Timeout: 3 * time.Second,
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+            return nil
+        },
 	})
 
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+// Node node struct
 type Node struct {
 	NodeID string `json:"node_id"`
 	IP     string `json:"node_ip"`
@@ -21,6 +22,7 @@ type Node struct {
 	Master bool   `json:"node_master"`
 }
 
+// NewNode new node
 func NewNode(ttl int64, port int, path string, worker, master bool) (*Node, error) {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
@@ -45,14 +47,17 @@ func NewNode(ttl int64, port int, path string, worker, master bool) (*Node, erro
 	return nil, errors.New("not found ip")
 }
 
+// ID get node id
 func (n *Node) ID() string {
 	return n.NodeID
 }
 
+// OutTime get timeout
 func (n *Node) OutTime() int64 {
 	return n.TTL
 }
 
+// String get node as string
 func (n *Node) String() string {
 	data, _ := json.Marshal(n)
 	return string(data)

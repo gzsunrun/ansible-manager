@@ -6,16 +6,19 @@ import (
 	"os"
 )
 
+// LocalStorage local repo
 type LocalStorage struct {
 	LocalPath string
 }
 
+// NewLocalStorage new local storage
 func NewLocalStorage(path string) (*LocalStorage, error) {
 	local := new(LocalStorage)
 	local.LocalPath = path
 	return local, os.MkdirAll(local.LocalPath, 0664)
 }
 
+// Put upload file
 func (local *LocalStorage) Put(repo *StorageParse) error {
 	srcFile, err := os.Open(repo.LocalPath)
 	if err != nil {
@@ -38,6 +41,7 @@ func (local *LocalStorage) Put(repo *StorageParse) error {
 	return err
 }
 
+// Get download file
 func (local *LocalStorage) Get(repo *StorageParse) error {
 	srcFile, err := os.Open(local.LocalPath + repo.RemotePath)
 	if err != nil {
@@ -60,10 +64,12 @@ func (local *LocalStorage) Get(repo *StorageParse) error {
 	return err
 }
 
+// Delete delete file
 func (local *LocalStorage) Delete(repo *StorageParse) error {
 	return os.Remove(local.LocalPath + repo.RemotePath)
 }
 
+// Share share file
 func (local *LocalStorage) Share(repo *StorageParse) (string, error) {
 	return "", nil
 }

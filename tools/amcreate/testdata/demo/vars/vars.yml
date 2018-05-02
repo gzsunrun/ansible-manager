@@ -1,0 +1,23 @@
+### 非常用修改项 ###
+
+# Mariadb 数据库配置
+mysql:
+  port: 3306
+  root_password: sunrunvas
+  cluster_name: iaas_db_cluster
+  consul:
+    service_name: iaas_db
+  user:
+    - username: sunruniaas
+      password: Sunruniaas38288446
+      database: sunruniaas
+    - username: grafana
+      password: Grafana38288446
+      database: grafana
+  database:
+    - name: sunruniaas
+      encoding: utf8
+      collation: utf8_bin
+    - name: grafana
+      encoding: utf8
+      collation: utf8_bin

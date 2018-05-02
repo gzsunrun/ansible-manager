@@ -9,6 +9,7 @@ import (
 	"errors"
 )
 
+// privateKey private key
 var privateKey = []byte(`-----BEGIN RSA PRIVATE KEY-----
 MIICXQIBAAKBgQDZsfv1qscqYdy4vY+P4e3cAtmvppXQcRvrF1cB4drkv0haU24Y
 7m5qYtT52Kr539RdbKKdLAM6s20lWy7+5C0DgacdwYWd/7PeCELyEipZJL07Vro7
@@ -25,6 +26,7 @@ DPwqA3N5TMNDQVGv8gMCQQCaKGJgWYgvo3/milFfImbp+m7/Y3vCptarldXrYQWO
 AQjxwc71ZGBFDITYvdgJM1MTqc8xQek1FXn1vfpy2c6O
 -----END RSA PRIVATE KEY-----`)
 
+// publicKey public key
 var publicKey = []byte(`-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZsfv1qscqYdy4vY+P4e3cAtmv
 ppXQcRvrF1cB4drkv0haU24Y7m5qYtT52Kr539RdbKKdLAM6s20lWy7+5C0Dgacd
@@ -32,6 +34,7 @@ wYWd/7PeCELyEipZJL07Vro7Ate8Bfjya+wltGK9+XNUIHiumUKULW4KDx21+1NL
 AUeJ6PeW+DAkmJWF6QIDAQAB
 -----END PUBLIC KEY-----`)
 
+// RsaEncrypt rsa encrypt
 func RsaEncrypt(origData []byte) (string, error) {
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
@@ -46,10 +49,11 @@ func RsaEncrypt(origData []byte) (string, error) {
 	return base64.StdEncoding.EncodeToString(data), err
 }
 
+// RsaDecrypt rsa decrypt
 func RsaDecrypt(src string) (string, error) {
 	block, _ := pem.Decode(privateKey)
 	if block == nil {
-		return "", errors.New("private key error!")
+		return "", errors.New("private key error")
 	}
 	priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {

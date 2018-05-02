@@ -1,0 +1,173 @@
+host1 ansible_ssh_host=10.21.1.234 ansible_user=root ansible_ssh_pass=sunrunvas
+host2 ansible_ssh_host=10.21.1.232 ansible_user=root ansible_ssh_pass=sunrunvas
+host3 ansible_ssh_host=10.21.1.229 ansible_user=root ansible_ssh_pass=sunrunvas
+
+# 时间同步集群,建议所有节点都安装
+[ntp]
+# ntp_master=yes (yes|no) 是否做为时间同步服务器，有且只有一个
+host1 ntp_master=yes
+host2
+host3
+
+# 数据库服务集群，建议3个
+[mariadb]
+# mysql_master=yes (yes|no) 是否做为数据库集群引导节点,有且只有一个
+host1 mysql_master=yes
+host2
+host3
+
+# 域名解析及服务健康检查服务集群,建议所有节点都安装
+[consul]
+# consul_server=yes (yes|no) 是否作爲仲裁節點,建议3或5个
+host1 consul_server=yes
+host2 consul_server=yes
+host3 consul_server=yes
+
+# 初始化Ceph环境及安装Ceph相关软件
+[ceph]
+# ceph_peer_ip=192.168.1.1 Ceph专用集群网通信地址（选填）
+# install_ceph_deploy=yes (yes|no) 是否安裝ceph_deploy（选填）
+host1 ceph_peer_ip=192.168.1.1 install_ceph_deploy=yes
+host2 ceph_peer_ip=192.168.1.2
+host3 ceph_peer_ip=192.168.1.3
+
+# Ceph管理节点,建议保持奇数3个及以上
+[ceph_mon]
+# mon_bootstrap=yes 是否做为Ceph集群引导节点，有且只有一个
+# if_ceph_exporter=yes 是否做为Ceph集群监控数据采集节点，建议2~3个
+host1 mon_bootstrap=yes if_ceph_exporter=yes
+host2 if_ceph_exporter=yes
+host3 
+
+# Ceph存储节点
+[ceph_osd]
+host1
+host2
+host3
+
+# Ceph对象存储网关,建议3个及以上
+[ceph_rgw]
+host1 
+host2
+host3
+
+# 时序型数据库，建议3个
+[influxdb]
+host1
+host2
+host3
+
+# 时序型数据库集群中间件，建议3个
+[influxdb_relay]
+host1
+host2
+host3
+
+# 监控视图，建议3个
+[grafana]
+# grafana_bootstrap=yes 是否作为初始化视图节点，有且只有一个
+host1   grafana_bootstrap=yes
+host2
+host3
+
+# 监控视图接口，建议3个
+[grafana_api]
+host1
+host2
+host3
+
+[iaas]
+# iaas_deploy=yes 用于分发iaas配置文件的节点，有且只有一个
+host1 iaas_deploy=yes
+
+# 建议3-5个
+# 必须与ceph_mon保持一致
+[cephapi]
+host1
+host2
+host3
+
+# 建议3-5个
+[dhcp]
+host1
+host2
+host3
+
+# 客户端接口，建议3~5个
+[userapi]
+host1
+host2
+host3
+
+# 消息中枢，建议3~5个
+[mbus]
+host1
+host2
+host3
+
+# 宿主机节点
+[hostagent]
+# hostagent_server=yes (yes|no) 是否作爲仲裁節點,建议3~5个
+host1 hostagent_server=yes
+host2 hostagent_server=yes
+host3 hostagent_server=yes
+
+[websockify]
+host1
+host2
+host3
+
+# 客户端监控数据获取接口，建议3~5个
+[monitor_converter]
+host1
+host2
+host3
+
+# 集群外部网关，建议3个
+[openresty]
+host1
+host2
+host3
+
+[ceph:children]
+ceph_mon
+ceph_osd
+ceph_rgw
+
+# 请勿修改该项
+[iaas:children]
+cephapi
+mbus
+hostagent
+userapi
+dhcp
+openresty
+
+# 请勿修改该项
+[consul:children]
+iaas
+mariadb
+
+[hostagent:vars]
+# nested_virt_enable=yes (yes|no) 是否開啓嵌套虛擬化
+nested_virt_enable=yes
+
+[consul:vars]
+# clean_services=yes (yes|no) 是否清除旧的服务配置
+clean_services=yes
+
+[mariadb:vars]
+# install_db=yes (yes|no) 是否重新安装mariadb集群,注意:yes会删除原有数据库
+install_db=yes
+
+[ntp:vars]
+# config_ntp=yes (yes|no) 是否配置ntp服務
+config_ntp=yes
+
+[ceph_osd:vars]
+# osd_zap=yes (yes|no) 是否清除数据
+osd_zap=yes
+# osd_prepare=yes (yes|no) 是否准备设备
+osd_prepare=yes
+# osd_activate=yes (yes|no) 是否激活设备
+osd_activate=yes

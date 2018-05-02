@@ -6,6 +6,7 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/config"
 )
 
+// KVClient kv client
 type KVClient interface {
 	LocalNode() *Node
 	AddTask(task Task) error
@@ -16,20 +17,24 @@ type KVClient interface {
 	SetCall(func(Node, bool), func(Task, bool), func(Task, bool))
 }
 
+// LocalMenory local data
 type LocalMenory struct {
 	Tasks map[string]Task
 	Nodes map[string]Node
 	Lock  *sync.Mutex
 }
 
+// Task task struct
 type Task struct {
 	Timer  bool
 	ID     string
 	NodeID string
 }
 
+// DefaultClient common kv client
 var DefaultClient KVClient
 
+// SetKVClient init common kv client
 func SetKVClient() error {
 	var err error
 	ep := config.Cfg.Etcd.Endpoints

@@ -8,8 +8,10 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/orm"
 )
 
+// TChan timer chan
 var TChan = make(map[string]chan bool)
 
+// SetTimer set timer
 func SetTimer(timerID string) {
 	res, timer, err := orm.GetTimer(timerID)
 	if err != nil {
@@ -90,6 +92,7 @@ func SetTimer(timerID string) {
 	return
 }
 
+// StopTimer stop timer
 func StopTimer(tid string) {
 	TChan[tid] <- true
 }

@@ -1290,3 +1290,23 @@ fieldset[disabled] .checkbox-custom label {
     color: #ddd;
     font-size: 15px;
 }
+
+#parse .well{
+    padding: 10px;
+    margin: 5px; 
+    border: 1px solid rgb(221, 221, 221);
+     border-radius: 3px;
+}
+
+#parse .row{
+    padding: 10px;
+}
+
+#parse h3{
+    font-size: 13px;
+}
+
+#parse button{
+    font-size: 8px;
+    line-height: 1.5;
+}

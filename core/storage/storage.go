@@ -4,11 +4,13 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/config"
 )
 
+// StorageParse storage parse
 type StorageParse struct {
 	RemotePath string
 	LocalPath  string
 }
 
+// FileStorage file storage interface
 type FileStorage interface {
 	Put(*StorageParse) error
 	Get(*StorageParse) error
@@ -16,8 +18,10 @@ type FileStorage interface {
 	Share(*StorageParse) (string, error)
 }
 
+// Storage grobal storage
 var Storage FileStorage
 
+// SetStorage set storage
 func SetStorage() error {
 	var err error
 	if config.Cfg.S3.Enable {
@@ -34,6 +38,7 @@ func SetStorage() error {
 	return err
 }
 
+// NewStorage new storage
 func NewStorage() (FileStorage, error) {
 	if config.Cfg.S3.Enable {
 		return NewS3Storage(config.Cfg.S3.S3URL,

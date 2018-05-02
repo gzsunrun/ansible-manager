@@ -1,33 +1,36 @@
 package tasks
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"fmt"
-	"html/template"
-	"io/ioutil"
+	//"html/template"
+	//"io/ioutil"
 	"os"
 	"os/exec"
-	"strconv"
+	//"strconv"
 	"time"
 
 	log "github.com/astaxie/beego/logs"
 	"github.com/gzsunrun/ansible-manager/core/config"
-	"github.com/gzsunrun/ansible-manager/core/function"
+	//"github.com/gzsunrun/ansible-manager/core/function"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/output"
 	"github.com/gzsunrun/ansible-manager/core/sockets"
 	"github.com/gzsunrun/ansible-manager/core/storage"
+	"github.com/gzsunrun/ansible-manager/core/template"
 )
 
 var workPath string
 var taskList = make(chan string)
 
+// AddTask add task
 func AddTask(taskID string) {
 	StopTask(taskID)
 	taskList <- taskID
 }
 
+// RunTask run task
 func RunTask() {
 	workPath = config.Cfg.Common.WorkPath
 	taskList = make(chan string)
@@ -48,6 +51,7 @@ func RunTask() {
 	}
 }
 
+// StopTask stop task
 func StopTask(id string) {
 	stopFunc := func(taskID string) {
 		SendLog(taskID, "\nChanged:User Stop\n")
@@ -55,6 +59,7 @@ func StopTask(id string) {
 	cmdst.StopCmd(id, stopFunc)
 }
 
+// newTask new a task
 func newTask(taskID string) error {
 	task := orm.Task{}
 	_, err := orm.GetTask(taskID, &task)
@@ -92,12 +97,16 @@ func newTask(taskID string) error {
 	}
 	newTask.log("ok: finish \n ")
 	newTask.log("[INSTALL HOSTS AND VARS]")
-	err = newTask.installVars()
+	//err = newTask.installVars()
+	wp,err := template.InstallVars(&(newTask.Desc), workPath+"/repo_"+newTask.Desc.ID)
 	if err != nil {
+		log.Error(err)
 		newTask.log("fatal: error \n ")
 		newTask.Desc.Status = "error"
 		return err
 	}
+	newTask.Path=wp
+	log.Info(wp)
 	newTask.log("ok: finish \n ")
 	err = newTask.runPlaybook()
 	if err != nil {
@@ -114,22 +123,25 @@ func newTask(taskID string) error {
 	return nil
 }
 
+// runPlaybook run playbook
 func (t *Task) runPlaybook() error {
+	dir :=  workPath + "/repo_" + t.Desc.ID+"/"+t.Path
 	args := make([]string, 0)
 	args = append(args, "-i")
-	args = append(args, workPath+"/repo_"+t.Desc.ID+"/hosts")
-	args = append(args, workPath+"/repo_"+t.Desc.ID+"/index.yml")
+	args = append(args, dir+"/hosts")
+	args = append(args, dir+"/index.yml")
 	if t.Desc.Tag != "" {
 		args = append(args, "--tags")
 		args = append(args, `"`+t.Desc.Tag+`"`)
 	}
 	cmd := exec.Command("ansible-playbook", args...)
-	cmd.Dir = workPath + "/repo_" + t.Desc.ID
+	cmd.Dir = dir
 	cmd.Env = envVars(workPath, cmd.Dir, nil)
 	t.logCmd(cmd)
 	return cmdst.StartCmd(cmd, t.Desc.ID)
 }
 
+// envVars ...
 func envVars(home string, pwd string, gitSSHCommand *string) []string {
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("HOME=%s", home))
@@ -143,6 +155,7 @@ func envVars(home string, pwd string, gitSSHCommand *string) []string {
 	return env
 }
 
+// downloadRepository download repo
 func (t *Task) downloadRepository() error {
 	repo := orm.Repository{}
 	err := orm.GetRepoByID(t.Desc.RepoID, &repo)
@@ -174,6 +187,7 @@ func (t *Task) downloadRepository() error {
 	return nil
 }
 
+// clcRepo clean local repo
 func (t *Task) clcRepo() error {
 
 	args := make([]string, 0)
@@ -189,79 +203,82 @@ func (t *Task) clcRepo() error {
 	return nil
 }
 
+// PlaybookParse playbook parse struct
 type PlaybookParse struct {
 	Hosts []orm.HostsList `json:"hosts"`
 	Group []orm.Group     `json:"group"`
 	Vars  []orm.Vars      `json:"vars"`
 }
 
-func (t *Task) installVars() error {
-	var hosts []orm.HostsList
-	err := orm.FindHostFromProject(t.Desc.ProjectID, &hosts)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	for i, g := range t.Desc.Group {
-		for j, h := range g.Hosts {
-			for _, hh := range hosts {
-				if hh.ID == h.HostUUID {
-					log.Info(hh.IP)
-					t.Desc.Group[i].Hosts[j].IP = hh.IP
-					t.Desc.Group[i].Hosts[j].HostName = hh.HostName
-				}
-			}
-		}
-	}
-	for i, val := range hosts {
-		if val.Key != "" && val.Password != "" {
-			if function.AuthKey(val) != "success" {
-				hosts[i].Key = ""
-			}
-		}
-		if val.HostName == "" {
-			hosts[i].HostName = "host" + strconv.Itoa(i)
-		}
-		if val.Key != "" {
-			if err := ioutil.WriteFile(workPath+"/repo_"+t.Desc.ID+"/key-"+val.IP, []byte(val.Key), 0600); err != nil {
-				log.Error(err)
-				return err
-			}
-		}
-	}
-	playbookParse := PlaybookParse{
-		Hosts: hosts,
-		Group: t.Desc.Group,
-		Vars:  t.Desc.Vars,
-	}
+// installVars create group vars
+// func (t *Task) installVars() error {
+// 	var hosts []orm.HostsList
+// 	err := orm.FindHostFromProject(t.Desc.ProjectID, &hosts)
+// 	if err != nil {
+// 		log.Error(err)
+// 		return err
+// 	}
+// 	for i, g := range t.Desc.Group {
+// 		for j, h := range g.Hosts {
+// 			for _, hh := range hosts {
+// 				if hh.ID == h.HostUUID {
+// 					t.Desc.Group[i].Hosts[j].IP = hh.IP
+// 					t.Desc.Group[i].Hosts[j].HostName = hh.HostName
+// 				}
+// 			}
+// 		}
+// 	}
+// 	for i, val := range hosts {
+// 		if val.Key != "" && val.Password != "" {
+// 			if function.AuthKey(val) != "success" {
+// 				hosts[i].Key = ""
+// 			}
+// 		}
+// 		if val.HostName == "" {
+// 			hosts[i].HostName = "host" + strconv.Itoa(i)
+// 		}
+// 		if val.Key != "" {
+// 			if err := ioutil.WriteFile(workPath+"/repo_"+t.Desc.ID+"/key-"+val.IP, []byte(val.Key), 0600); err != nil {
+// 				log.Error(err)
+// 				return err
+// 			}
+// 		}
+// 	}
+// 	playbookParse := PlaybookParse{
+// 		Hosts: hosts,
+// 		Group: t.Desc.Group,
+// 		Vars:  t.Desc.Vars,
+// 	}
 
-	for _, val := range t.Desc.Vars {
-		v, err := json.Marshal(val.Value.Vars)
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-		err = ioutil.WriteFile(workPath+"/repo_"+t.Desc.ID+"/"+val.Path, v, 0600)
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-	}
+// 	for _, val := range t.Desc.Vars {
+// 		v, err := json.Marshal(val.Value.Vars)
+// 		if err != nil {
+// 			log.Error(err)
+// 			return err
+// 		}
+// 		err = ioutil.WriteFile(workPath+"/repo_"+t.Desc.ID+"/"+val.Path, v, 0600)
+// 		if err != nil {
+// 			log.Error(err)
+// 			return err
+// 		}
+// 	}
 
-	tmpl, err := template.ParseFiles(workPath + "/repo_" + t.Desc.ID + "/hosts")
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	fd, err := os.OpenFile(workPath+"/repo_"+t.Desc.ID+"/hosts", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0664)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	err = tmpl.Execute(fd, playbookParse)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	return nil
-}
+// 	tmpl, err := template.ParseFiles(workPath + "/repo_" + t.Desc.ID + "/hosts")
+// 	if err != nil {
+// 		log.Error(err)
+// 		return err
+// 	}
+// 	fd, err := os.OpenFile(workPath+"/repo_"+t.Desc.ID+"/hosts", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0664)
+// 	if err != nil {
+// 		log.Error(err)
+// 		return err
+// 	}
+// 	err = tmpl.Execute(fd, playbookParse)
+// 	if err != nil {
+// 		log.Error(err)
+// 		return err
+// 	}
+// 	return nil
+// }
+
+// installVars create group vars

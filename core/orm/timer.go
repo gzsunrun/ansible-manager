@@ -6,6 +6,7 @@ import (
 	log "github.com/astaxie/beego/logs"
 )
 
+// Timer timer table
 type Timer struct {
 	ID       string    `xorm:"timer_id" json:"timer_id"`
 	TaskID   string    `xorm:"task_id" json:"task_id"`
@@ -19,6 +20,7 @@ type Timer struct {
 	Created  time.Time `xorm:"created" json:"created"`
 }
 
+// CreateTimer create timer
 func CreateTimer(t *Timer) error {
 	_, err := MysqlDB.Table("ansible_timer").Insert(t)
 	if err != nil {
@@ -27,6 +29,7 @@ func CreateTimer(t *Timer) error {
 	return err
 }
 
+// FindTimers find timers
 func FindTimers(uid string) (*[]Timer, error) {
 	var timers []Timer
 	err := MysqlDB.Table("ansible_timer").Where("user_id=?", uid).Find(&timers)
@@ -37,6 +40,7 @@ func FindTimers(uid string) (*[]Timer, error) {
 	return &timers, err
 }
 
+// GetTimer get timer
 func GetTimer(tid string) (bool, *Timer, error) {
 	var timer Timer
 	res, err := MysqlDB.Table("ansible_timer").Where("timer_id=?", tid).Get(&timer)
@@ -47,6 +51,7 @@ func GetTimer(tid string) (bool, *Timer, error) {
 	return res, &timer, err
 }
 
+// UpdateTimerStatus uptate timer status
 func UpdateTimerStatus(t *Timer) error {
 	_, err := MysqlDB.Table("ansible_timer").Cols("timer_status").Where("timer_id=?", t.ID).Update(t)
 	if err != nil {
@@ -55,6 +60,7 @@ func UpdateTimerStatus(t *Timer) error {
 	return err
 }
 
+// UpdateTimerRun uptate timer status is run
 func UpdateTimerRun(t *Timer) error {
 	_, err := MysqlDB.Table("ansible_timer").Cols("timer_repeat", "timer_start").Where("timer_id=?", t.ID).Update(t)
 	if err != nil {
@@ -63,6 +69,7 @@ func UpdateTimerRun(t *Timer) error {
 	return err
 }
 
+// UpdateTimer update timer
 func UpdateTimer(t *Timer) error {
 	_, err := MysqlDB.Table("ansible_timer").Where("timer_id=?", t.ID).Update(t)
 	if err != nil {
@@ -71,6 +78,7 @@ func UpdateTimer(t *Timer) error {
 	return err
 }
 
+// UpdateTimerStart update timer start
 func UpdateTimerStart(t *Timer) error {
 	_, err := MysqlDB.Table("ansible_timer").Cols("timer_status", "timer_start").Where("timer_id=?", t.ID).Update(t)
 	if err != nil {
@@ -79,6 +87,7 @@ func UpdateTimerStart(t *Timer) error {
 	return err
 }
 
+// DelTimer detele timer
 func DelTimer(tid string) error {
 	timer := new(Timer)
 	_, err := MysqlDB.Table("ansible_timer").Where("timer_id=?", tid).Delete(timer)

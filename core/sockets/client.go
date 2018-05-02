@@ -9,8 +9,10 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/kv"
 )
 
+// WsChan ws client chan
 var WsChan = make(map[string]chan bool)
 
+// Client create a client by task id
 func Client(taskID string) {
 	if WsChan[taskID] != nil {
 		return
@@ -64,7 +66,8 @@ func Client(taskID string) {
 				log.Error("write close:", err)
 				return
 			}
-
+			// close  local connect
+			CloseConn(taskID)
 			select {
 			case <-done:
 			case <-time.After(time.Second):
@@ -74,6 +77,7 @@ func Client(taskID string) {
 	}
 }
 
+// StopClient close client
 func StopClient(taskID string) {
 	if WsChan[taskID] == nil {
 		return

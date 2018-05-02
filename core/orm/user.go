@@ -9,6 +9,7 @@ import (
 	log "github.com/astaxie/beego/logs"
 )
 
+// User user table
 type User struct {
 	ID       string    `xorm:"user_id" json:"user_id"`
 	Account  string    `xorm:"user_account" json:"user_account"`
@@ -16,6 +17,7 @@ type User struct {
 	Created  time.Time `xorm:"created" json:"created"`
 }
 
+// UserList User list
 type UserList struct {
 	ID       string    `xorm:"user_id" json:"user_id"`
 	Account  string    `xorm:"user_account" json:"user_account"`
@@ -23,6 +25,7 @@ type UserList struct {
 	Created  time.Time `xorm:"created" json:"created"`
 }
 
+// AuthUser auth user
 func AuthUser(a, p string) (bool, string) {
 	h := md5.New()
 	io.WriteString(h, p)
@@ -35,6 +38,7 @@ func AuthUser(a, p string) (bool, string) {
 	return res, user.ID
 }
 
+// AddUser add user
 func AddUser(user *User) error {
 	h := md5.New()
 	io.WriteString(h, user.Password)
@@ -47,6 +51,7 @@ func AddUser(user *User) error {
 	return err
 }
 
+// UpdateUser update user
 func UpdateUser(user *User) error {
 	h := md5.New()
 	io.WriteString(h, user.Password)
@@ -59,6 +64,7 @@ func UpdateUser(user *User) error {
 	return err
 }
 
+// FindUsers find users
 func FindUsers() (*[]UserList, error) {
 	var user []UserList
 	err := MysqlDB.Table("ansible_user").Find(&user)
@@ -68,6 +74,7 @@ func FindUsers() (*[]UserList, error) {
 	return &user, err
 }
 
+// DelUser delete user
 func DelUser(uid string) error {
 	user := new(User)
 	_, err := MysqlDB.Table("ansible_user").Where("user_id=?", uid).Delete(user)
@@ -76,6 +83,8 @@ func DelUser(uid string) error {
 	}
 	return err
 }
+
+// GetUser get user
 func GetUser(uid string) (*UserList, error) {
 	var user UserList
 	res, err := MysqlDB.Table("ansible_user").Where("user_id=?", uid).Get(&user)

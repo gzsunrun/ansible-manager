@@ -1,0 +1,24 @@
+{{range $index, $host:=.Hosts}}{{$host.HostName}} ansible_ssh_host={{$host.IP}} {{if ne $host.Key ""}}ansible_ssh_private_key_file=key-{{$host.IP}}{{else}}ansible_user={{$host.User}} ansible_ssh_pass={{$host.Password}}{{end}} 
+{{end}}
+		
+{{range $index, $group:=.Group}}[{{$group.Name}}]{{range $index, $host:=$group.Hosts}}
+{{$host.HostName}} {{range $index, $attr:=$host.Attr}}{{$attr.Key}}={{$attr.Value}} {{end}}{{end}}
+		
+{{end}}
+[ceph:children]
+ceph_mon
+ceph_osd
+ceph_rgw
+
+[iaas:children]
+cephapi
+mbus
+hostagent
+userapi
+dhcp
+openresty
+
+[consul:children]
+iaas
+mariadb
+

@@ -1,0 +1,79 @@
+- attr:
+  - default: "yes"
+    key: consul_server
+    type: bool
+  - default: "yes"
+    key: clean_services
+    type: bool
+  group_name: consul
+- attr:
+  - default: 192.168.1.1
+    key: ceph_peer_ip
+    type: string
+  - default: "yes"
+    key: install_ceph_deploy
+    type: bool
+  - default: "yes"
+    key: mon_bootstrap
+    type: bool
+  - default: "yes"
+    key: if_ceph_exporter
+    type: bool
+  group_name: ceph
+- attr:
+  - default: "yes"
+    key: hostagent_server
+    type: bool
+  - default: "yes"
+    key: nested_virt_enable
+    type: bool
+  group_name: hostagent
+- attr: []
+  group_name: websockify
+- attr:
+  - default: "yes"
+    key: ntp_master
+    type: bool
+  - default: "yes"
+    key: config_ntp
+    type: bool
+  - default: "yes"
+    key: osd_zap
+    type: bool
+  - default: "yes"
+    key: osd_prepare
+    type: bool
+  - default: "yes"
+    key: osd_activate
+    type: bool
+  group_name: ntp
+- attr: []
+  group_name: influxdb
+- attr: []
+  group_name: dhcp
+- attr: []
+  group_name: userapi
+- attr:
+  - default: "yes"
+    key: mysql_master
+    type: bool
+  - default: "yes"
+    key: install_db
+    type: bool
+  group_name: mariadb
+- attr: []
+  group_name: cephapi
+- attr: []
+  group_name: mbus
+- attr:
+  - default: "yes"
+    key: iaas_deploy
+    type: bool
+  group_name: iaas
+- attr: []
+  group_name: openresty
+- attr:
+  - default: "yes"
+    key: grafana_bootstrap
+    type: bool
+  group_name: grafana

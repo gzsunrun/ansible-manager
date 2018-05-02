@@ -1,0 +1,36 @@
+mysql:
+  properties:
+    cluster_name:
+      type: string
+    consul:
+      properties:
+        service_name:
+          type: string
+      type: object
+    database:
+      items:
+        properties:
+          collation:
+            type: string
+          encoding:
+            type: string
+          name:
+            type: string
+        type: object
+      type: array
+    port:
+      type: number
+    root_password:
+      type: string
+    user:
+      items:
+        properties:
+          database:
+            type: string
+          password:
+            type: string
+          username:
+            type: string
+        type: object
+      type: array
+  type: object

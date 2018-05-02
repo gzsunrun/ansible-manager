@@ -1,0 +1,7 @@
+- name: demo
+  version: "2.25"
+  desc: "test demo"
+  inventory: "demo/inventory"
+  am_dir: "_AM/demo"
+  vars_dir: "demo/vars"
+  index: "demo/demo.yml"

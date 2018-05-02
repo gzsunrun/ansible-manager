@@ -20,7 +20,8 @@
     </style>
     <!-- jquery js -->
     <script src="dist/lib/jquery/jquery.js"></script>
-    <script src="js/jquery.jsoneditor.min.js"></script> 
+    <script src="js/jquery.jsoneditor.min.js"></script>
+    <script src="js/jsoneditor.min.js"></script> 
     <script src="dist/lib/jquery/jquery.cookie.js"></script>
 </head>
 
@@ -102,9 +103,17 @@
                                     <span class="inv"></span>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label for="playbook" class="col-sm-2">配置</label>
+                                <div class="col-md-9 col-sm-10">
+                                    <span id="parse"></span>
+                                </div>
+                            </div>
+                            
                             <span id="playbook-parse" class="json-editor"></span>
                             <a href="javascript:CreateTask();" id="task-create" class="btn btn-primary pull-right disabled">提交</a>
                         </form>
+                        
                     </div>
                 </div>
             </div>

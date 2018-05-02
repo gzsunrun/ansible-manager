@@ -6,6 +6,7 @@ import (
 	log "github.com/astaxie/beego/logs"
 )
 
+// Task task table
 type Task struct {
 	ID        string    `xorm:"task_id" json:"task_id"`
 	ProjectID string    `xorm:"project_id" json:"project_id"`
@@ -20,6 +21,7 @@ type Task struct {
 	Created   time.Time `xorm:"created" json:"created"`
 }
 
+// TaskList task output list
 type TaskList struct {
 	ID        string    `xorm:"task_id" json:"task_id"`
 	ProjectID string    `xorm:"project_id" json:"-"`
@@ -34,12 +36,14 @@ type TaskList struct {
 	Created   time.Time `xorm:"created" json:"created"`
 }
 
+// GroupAttr group attr
 type GroupAttr struct {
 	Key   string `json:"key"`
 	Type  string `json:"type"`
 	Value string `json:"value"`
 }
 
+// GroupHosts group hosts
 type GroupHosts struct {
 	HostName string      `json:"host_name"`
 	HostUUID string      `json:"host_uuid"`
@@ -48,12 +52,14 @@ type GroupHosts struct {
 	Attr     []GroupAttr `json:"attr"`
 }
 
+// Group group inventory
 type Group struct {
 	Name  string       `json:"group_name"`
 	Hosts []GroupHosts `json:"hosts"`
 	Attr  []GroupAttr  `json:"attr"`
 }
 
+// TaskCounts task count
 type TaskCounts struct {
 	Err     int64 `json:"error_total"`
 	Success int64 `json:"success_total"`
@@ -61,6 +67,7 @@ type TaskCounts struct {
 	Run     int64 `json:"run_total"`
 }
 
+// CreateTask create task
 func CreateTask(task *Task) error {
 	_, err := MysqlDB.Table("ansible_task").Insert(task)
 	if err != nil {
@@ -69,6 +76,7 @@ func CreateTask(task *Task) error {
 	return err
 }
 
+// UpdateTask update task
 func UpdateTask(task *Task) error {
 	_, err := MysqlDB.Table("ansible_task").Where("task_id=?", task.ID).Update(task)
 	if err != nil {
@@ -77,6 +85,7 @@ func UpdateTask(task *Task) error {
 	return err
 }
 
+// UpdateTaskByProject update task by project
 func UpdateTaskByProject(task *Task) error {
 	_, err := MysqlDB.Table("ansible_task").Where("project_id=?", task.ProjectID).Update(task)
 	if err != nil {
@@ -85,6 +94,7 @@ func UpdateTaskByProject(task *Task) error {
 	return err
 }
 
+// GetTask get task
 func GetTask(tid string, task interface{}) (bool, error) {
 	res, err := MysqlDB.Table("ansible_task").Where("task_id=?", tid).Get(task)
 	if err != nil {
@@ -93,6 +103,7 @@ func GetTask(tid string, task interface{}) (bool, error) {
 	return res, err
 }
 
+// FindTasks find tasks
 func FindTasks(pid string, task interface{}) error {
 	err := MysqlDB.Table("ansible_task").Where("project_id=?", pid).Find(task)
 	if err != nil {
@@ -102,6 +113,7 @@ func FindTasks(pid string, task interface{}) error {
 	return nil
 }
 
+// DelTask delete task
 func DelTask(tid string) error {
 	task := new(Task)
 	_, err := MysqlDB.Table("ansible_task").Where("task_id=?", tid).Delete(task)
@@ -112,6 +124,7 @@ func DelTask(tid string) error {
 	return nil
 }
 
+// GetTaskCount get task count
 func GetTaskCount() (*TaskCounts, error) {
 	task := new(Task)
 	total, err := MysqlDB.Table("ansible_task").Count(task)
