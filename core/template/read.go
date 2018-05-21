@@ -58,7 +58,7 @@ func ReadVars(filePath string,remotePath string) ([]orm.RepositoryInsert,error) 
 	for _,t:=range tpl{
 		tdir:=dir+"/"+t.AMDir
 		var repo orm.RepositoryInsert
-		repo.Name=t.Name+"."+t.Version
+		repo.Name=t.Name+"-"+t.Version
 		repo.Path=remotePath
 		repo.Desc=t.Desc
 		repo.ID=uuid.Must(uuid.NewV4()).String()

@@ -22,4 +22,26 @@ ansible-manager 实现的是类似ansible ui 的功能，让你的playbook脚本
 
 [安装说明](./Install.md)
 
-[脚本规范](./Playbook.md)
+## AMfile
+
+```yaml
+- name: demo #脚本名字
+  version: "2.25" #脚本版本
+  desc: "test demo" #脚本描述
+  inventory: "demo/inventory" #inventory文件路径
+  am_dir: "_AM/demo" #生成模板路径
+  vars_dir: "demo/vars" #变量文件路径
+  index: "demo/demo.yml" #执行入口文件
+  
+```
+
+## vars 变量是空数组特殊注释
+
+```yaml
+abc:
+  ddd: 123
+  c: []
+    #@- d: 1
+    #@  e: 2
+
+```

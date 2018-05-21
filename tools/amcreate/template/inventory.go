@@ -35,31 +35,29 @@ func GetGroup(path string)(string,string,error){
 		if strings.Contains(s,"#"){
 			return 
 		}
-		res1,err:=regexp.MatchString(`\[[a-z]*\]`,s)
-		if err!=nil{
-			return
-		}
-		if res1{
-			child=false
-			digitsRegexp := regexp.MustCompile(`[a-z]+`)
-			name:=digitsRegexp.FindStringSubmatch(s)
-			groupName = name[0]
-			if groupMap[groupName]==nil{
-				groupMap[groupName]=new(Group)
-				groupMap[groupName].Name=groupName
-				groupMap[groupName].Attr=make([]GroupAttr,0)
-			}
-			return
-		}
-		res2,err:=regexp.MatchString(`\[[a-z]*:vars\]`,s)
+
+		// group vars
+		res2,err:=regexp.MatchString(`\[.*:vars\]`,s)
 		if err!=nil{
 			return
 		}
 		if res2{
 			child=false
-			digitsRegexp := regexp.MustCompile(`[a-zA-Z]+:[a-zA-Z]+`)
-			name:=digitsRegexp.FindStringSubmatch(s)
-			groupName = strings.Split(name[0],":")[0]
+			flag :=false
+			name :=""
+			for _,rn:=range s{
+				if rn==rune(']'){
+					break
+				}
+				if flag{
+					name+=string(rn)
+				}
+				if rn==rune('['){
+					flag=true
+				}
+			}
+
+			groupName = strings.Split(name,":")[0]
 			if groupMap[groupName]==nil{
 				groupMap[groupName]=new(Group)
 				groupMap[groupName].Name=groupName
@@ -67,7 +65,9 @@ func GetGroup(path string)(string,string,error){
 			}
 			return
 		}
-		res3,err:=regexp.MatchString(`\[[a-z]*:children\]`,s)
+
+		// group children
+		res3,err:=regexp.MatchString(`\[.*:children\]`,s)
 		if err!=nil{
 			return
 		}
@@ -76,6 +76,37 @@ func GetGroup(path string)(string,string,error){
 			child=true
 			return
 		}
+
+		// group
+		res1,err:=regexp.MatchString(`\[.*\]`,s)
+		if err!=nil{
+			return
+		}
+		if res1{
+			child=false
+			flag :=false
+			name :=""
+			for _,rn:=range s{
+				if rn==rune(']'){
+					break
+				}
+				if flag{
+					name+=string(rn)
+				}
+				if rn==rune('['){
+					flag=true
+				}
+			}
+
+			groupName = name
+			if groupMap[groupName]==nil{
+				groupMap[groupName]=new(Group)
+				groupMap[groupName].Name=groupName
+				groupMap[groupName].Attr=make([]GroupAttr,0)
+			}
+			return
+		}
+		
 		if groupName == ""{
 			return
 		}
@@ -132,8 +163,6 @@ func GetGroup(path string)(string,string,error){
 		fmt.Println(err)
 		return "","",err 
 	}
-	//fmt.Println(string(data))
-	//fmt.Println(staticContent)
 	return string(data),staticContent,nil
 }
 

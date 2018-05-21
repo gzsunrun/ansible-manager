@@ -1292,7 +1292,7 @@ fieldset[disabled] .checkbox-custom label {
 }
 
 #parse .well{
-    padding: 10px;
+    padding: 2px;
     margin: 5px; 
     border: 1px solid rgb(221, 221, 221);
      border-radius: 3px;

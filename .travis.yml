@@ -21,4 +21,4 @@ before_install:
   - go get github.com/dgrijalva/jwt-go
 
 script:
-  - go test -v ./...
+  - go build -v

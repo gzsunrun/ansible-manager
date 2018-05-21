@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"io"
 	"bufio"
@@ -14,99 +15,128 @@ import (
 )
 
 func main(){
+	if len(os.Args)!=2{
+		fmt.Print("error,please try:\n\namcreate build : create a template\namcreate gz : create .tar.gz\n\n")
+		return 
+	}
 	root:=path.Dir(os.Args[0])
-	data,err:=ioutil.ReadFile(root+"/AMfile.yml")
-	if err!=nil{
-		logs.Error(err)
-		return
+
+	if os.Args[1]=="build"{
+		data,err:=ioutil.ReadFile(root+"/AMfile.yml")
+		if err!=nil{
+			logs.Error(err)
+			return
+		}
+		var am []Template
+		err=yaml.Unmarshal(data,&am)
+		if err!=nil{
+			logs.Error(err)
+			return
+		}
+		for _,v :=range am{
+			varsPath,err:=getFilelist(root+"/"+v.VarsDir)
+			if err!=nil{
+				logs.Error(err)
+				return
+			}
+			amDir:=v.AmDir
+			err=os.MkdirAll(root+"/"+amDir,0666)
+			if err!=nil{
+				logs.Error(err)
+				return
+			}
+			logs.Info(varsPath,"\n")
+			for _,p:=range varsPath{
+				logs.Info(p,"\n")
+				bpath:=strings.Replace(strings.Replace(p,"\\","/",-1),v.VarsDir,amDir+"/vars",1)
+				logs.Info(bpath)
+				err=os.MkdirAll(path.Dir(bpath),0666)
+				if err!=nil{
+					logs.Error(err)
+					return
+				}
+				data,err:=template.RefVars(p)
+				if err!=nil{
+					logs.Error(err)
+					return
+				}
+				ioutil.WriteFile(bpath,data,0666)
+				if err!=nil{
+					logs.Error(err)
+					return
+				}
+			}
+			group,inv,err:=template.GetGroup(root+"/"+v.Inv)
+			if err!=nil{
+				return
+			}
+			inv=inventory+inv
+			err=ioutil.WriteFile(root+"/"+amDir+"/hosts",[]byte(inv),0666)
+			if err!=nil{
+				logs.Error(err)
+				return
+			}
+			err=ioutil.WriteFile(root+"/"+amDir+"/group.yml",[]byte(group),0666)
+			if err!=nil{
+				logs.Error(err)
+				return
+			}
+			cfg:=""
+			err=readLine(root+"/"+path.Dir(v.Index)+"/ansible.cfg",func(p string){
+				if strings.Contains(p,"inventory"){
+					cfg+="inventory = hosts\n"
+					return
+				}
+				cfg+=p+"\n"
+			})
+			if err!=nil{
+				logs.Error(err)
+				return
+			}
+			err = ioutil.WriteFile(root+"/"+amDir+"/ansible.cfg",[]byte(cfg),0666)
+			if err!=nil{
+				logs.Error(err)
+				return
+			}
+			err = ioutil.WriteFile(root+"/"+amDir+"/tag.yml",[]byte(tag),0666)
+			if err!=nil{
+				logs.Error(err)
+				return
+			}
+			err = ioutil.WriteFile(root+"/"+amDir+"/notes.md",[]byte("## "+v.Name),0666)
+			if err!=nil{
+				logs.Error(err)
+				return
+			}
+			for _,in:=range strings.Split(v.AmDir,"/"){
+				if in!=""{
+					v.Index="../"+v.Index
+				}
+			}
+			err = ioutil.WriteFile(root+"/"+amDir+"/index.yml",[]byte(`- include: "`+v.Index+`"`),0666)
+			if err!=nil{
+				logs.Error(err)
+				return
+			}
+		}
 	}
-	var am []Template
-	err=yaml.Unmarshal(data,&am)
-	if err!=nil{
-		logs.Error(err)
-		return
-	}
-	for _,v :=range am{
-		varsPath,err:=getFilelist(root+"/"+v.VarsDir)
-		if err!=nil{
-			logs.Error(err)
+	
+	if os.Args[1]=="gz"{
+		files :=make([]*os.File,0)
+		dir, err := ioutil.ReadDir(root)
+		if err != nil {
 			return
 		}
-		amDir:=v.AmDir
-		err=os.MkdirAll(root+"/"+amDir,0666)
-		if err!=nil{
-			logs.Error(err)
-			return
-		}
-		logs.Info(varsPath,"\n")
-		for _,p:=range varsPath{
-			logs.Info(p,"\n")
-			bpath:=strings.Replace(strings.Replace(p,"\\","/",-1),v.VarsDir,amDir+"/vars",1)
-			logs.Info(bpath)
-			err=os.MkdirAll(path.Dir(bpath),0666)
+		for _, fi := range dir {
+			f,err:=os.Open(root+"/"+fi.Name())
 			if err!=nil{
 				logs.Error(err)
 				return
 			}
-			data,err:=template.RefVars(p)
-			if err!=nil{
-				logs.Error(err)
-				return
-			}
-			ioutil.WriteFile(bpath,data,0666)
-			if err!=nil{
-				logs.Error(err)
-				return
-			}
+			files=append(files,f)
 		}
-		group,inv,err:=template.GetGroup(root+"/"+v.Inv)
-		if err!=nil{
-			return
-		}
-		inv=inventory+inv
-		err=ioutil.WriteFile(root+"/"+amDir+"/hosts",[]byte(inv),0666)
-		if err!=nil{
-			logs.Error(err)
-			return
-		}
-		err=ioutil.WriteFile(root+"/"+amDir+"/group.yml",[]byte(group),0666)
-		if err!=nil{
-			logs.Error(err)
-			return
-		}
-		cfg:=""
-		err=readLine(root+"/"+path.Dir(v.Index)+"/ansible.cfg",func(p string){
-			if strings.Contains(p,"inventory"){
-				cfg+="inventory = hosts\n"
-				return
-			}
-			cfg+=p+"\n"
-		})
-		if err!=nil{
-			logs.Error(err)
-			return
-		}
-		err = ioutil.WriteFile(root+"/"+amDir+"/ansible.cfg",[]byte(cfg),0666)
-		if err!=nil{
-			logs.Error(err)
-			return
-		}
-		err = ioutil.WriteFile(root+"/"+amDir+"/tag.yml",[]byte(tag),0666)
-		if err!=nil{
-			logs.Error(err)
-			return
-		}
-		err = ioutil.WriteFile(root+"/"+amDir+"/notes.md",[]byte("## "+v.Name),0666)
-		if err!=nil{
-			logs.Error(err)
-			return
-		}
-		for _,in:=range strings.Split(v.AmDir,"/"){
-			if in!=""{
-				v.Index="../"+v.Index
-			}
-		}
-		err = ioutil.WriteFile(root+"/"+amDir+"/index.yml",[]byte(`- include: "`+v.Index+`"`),0666)
+		
+		err = template.Compress(files,"test.tar.gz")
 		if err!=nil{
 			logs.Error(err)
 			return
