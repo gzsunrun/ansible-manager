@@ -126,6 +126,7 @@ func newTask(taskID string) error {
 // runPlaybook run playbook
 func (t *Task) runPlaybook() error {
 	dir :=  workPath + "/repo_" + t.Desc.ID+"/"+t.Path
+	log.Info(dir)
 	args := make([]string, 0)
 	args = append(args, "-i")
 	args = append(args, dir+"/hosts")

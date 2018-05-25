@@ -49,4 +49,7 @@ unused: $(GOVENDOR)
 
 build:
 	@echo ">> building binaries"
+	@go-bindata -o=asset/asset.go -pkg=asset public/...
 	@$(GO) build -v
+
+    

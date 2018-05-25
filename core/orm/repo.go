@@ -1,8 +1,10 @@
 package orm
 
 import (
-	log "github.com/astaxie/beego/logs"
 	"time"
+
+	log "github.com/astaxie/beego/logs"
+	
 )
 
 // Repository repo table
@@ -117,13 +119,11 @@ func CreateRepos(repos []RepositoryInsert) error {
 			return err
 		}
 		if res{
-			_,err:=session.Table("ansible_repository").Where("repo_name=?",v.Name).Update(v)
-			if err!=nil{
-				return err
-			}
+			log.Error(v.Name,"playbook is exit")
 		}else{
-			_,err:=session.Table("ansible_repository").Where("repo_name=?",v.Name).Insert(v)
+			_,err:=session.Table("ansible_repository").Insert(v)
 			if err!=nil{
+				log.Error(err)
 				return err
 			}	
 		}

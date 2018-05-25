@@ -12,6 +12,7 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/sockets"
 	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/tasks"
+	"github.com/gzsunrun/ansible-manager/asset"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/gzsunrun/ansible-manager/routers"
 )
@@ -54,7 +55,12 @@ func run() {
 	beego.BConfig.CopyRequestBody = true
 	beego.BConfig.Log.FileLineNum = true
 	if config.Cfg.Common.UAPI {
-		beego.SetStaticPath("/ui", "public/")
+		err:=asset.RestoreAssets("/var/lib/amgr/","public")
+		if err != nil {
+			logs.Error(err)
+			return
+		}
+		beego.SetStaticPath("/ui", "/var/lib/amgr/public/")
 	}
 	beego.BConfig.Listen.HTTPPort = config.Cfg.Common.Port
 	beego.Run()

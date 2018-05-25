@@ -19,6 +19,21 @@ type PlaybookParse struct {
 	Vars  []orm.Vars      `json:"vars"`
 }
 
+// ReadAMfile read am file
+func ReadAMfile(dir string)([]Template,error){
+	var tpls []Template
+	tplByte, err := ioutil.ReadFile(dir + "/AMfile.yml")
+	if err != nil {
+		return tpls,err
+	}
+
+	err = yaml.Unmarshal(tplByte, &tpls)
+	if err != nil {
+		return tpls,err
+	}
+	return tpls,err
+}
+
 // InstallVars create group vars
 func InstallVars(t *orm.Task,dir string) (workPath string ,err error) {
 	tplByte, err := ioutil.ReadFile(dir + "/AMfile.yml")
@@ -39,7 +54,7 @@ func InstallVars(t *orm.Task,dir string) (workPath string ,err error) {
 	}
 	var temp Template
 	for _,tpl:=range tpls{
-		if tpl.Name+"."+tpl.Version==repo.Name{
+		if tpl.Name+"-"+tpl.Version==repo.Name{
 			temp=tpl
 			workPath = tpl.AMDir
 			break

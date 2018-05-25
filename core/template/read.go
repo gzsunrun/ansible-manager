@@ -97,9 +97,9 @@ func ReadVars(filePath string,remotePath string) ([]orm.RepositoryInsert,error) 
 		}
 		repo.Tag = tagMap
 		repo.Note = "暂无简介"
-		_, err = os.Stat(dir + "/notes.md")
+		_, err = os.Stat(tdir + "/notes.md")
 		if err == nil || os.IsExist(err) {
-			notes, err := ioutil.ReadFile(dir + "/notes.md")
+			notes, err := ioutil.ReadFile(tdir + "/notes.md")
 			if err != nil {
 				log.Error(err)
 				return repos,err
