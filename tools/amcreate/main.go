@@ -83,16 +83,29 @@ func main(){
 			}
 			cfg:=""
 			err=readLine(root+"/"+path.Dir(v.Index)+"/ansible.cfg",func(p string){
+				
+				// inventory inventory path
 				if strings.Contains(p,"inventory"){
 					cfg+="inventory = hosts\n"
 					return
 				}
+
+				// roles path
+				if strings.Contains(p,"roles_path"){
+					
+					ps:=strings.Split(p,"=")
+					rolePath:=strings.TrimSpace(ps[1])
+					for _,in:=range strings.Split(v.AmDir,"/"){
+						if in!=""{
+							rolePath ="../"+rolePath
+						}
+					}
+					cfg+="roles_path = "+rolePath+"\n"
+					return
+				}
 				cfg+=p+"\n"
 			})
-			if err!=nil{
-				logs.Error(err)
-				return
-			}
+
 			err = ioutil.WriteFile(root+"/"+amDir+"/ansible.cfg",[]byte(cfg),0666)
 			if err!=nil{
 				logs.Error(err)

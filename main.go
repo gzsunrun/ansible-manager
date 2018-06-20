@@ -60,7 +60,8 @@ func run() {
 			logs.Error(err)
 			return
 		}
-		beego.SetStaticPath("/ui", "/var/lib/amgr/public/")
+		//beego.SetStaticPath("/ui", "/var/lib/amgr/public/")
+		beego.SetStaticPath("/ui", "./public/") 
 	}
 	beego.BConfig.Listen.HTTPPort = config.Cfg.Common.Port
 	beego.Run()

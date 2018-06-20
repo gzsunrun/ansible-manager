@@ -7,11 +7,12 @@ import (
 )
 
 func Test_RsaEncrypt(t *testing.T) {
-	data, err := orm.RsaEncrypt([]byte("123456"))
+	a:=`12333fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff`
+	data, err := orm.RsaEncrypt([]byte(a))
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(string(data))
+	fmt.Println(data)
 	origData, err := orm.RsaDecrypt(data)
 	if err != nil {
 		t.Fatal(err)
