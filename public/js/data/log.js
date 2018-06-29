@@ -6,7 +6,18 @@ var term = new Terminal({
     cursorBlink: true,
     convertEol: true
   });
+// var sdata
+// term.on('data', function(data){
+//     if (event.keyCode == 13) {
+//         alert(sdata);
+//         sdata =""
+//         term.write("\n")
+//     }
+//     term.write(data)
+//     sdata +=data
+// })
 term.open($("#term").empty()[0]);
+
 
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");

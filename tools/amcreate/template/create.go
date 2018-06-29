@@ -1,86 +1,71 @@
-package main
+package template
 
 import (
-	"fmt"
 	"strings"
-	"io"
-	"bufio"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"github.com/ghodss/yaml"
 	"github.com/astaxie/beego/logs"
-	"github.com/gzsunrun/ansible-manager/tools/amcreate/template"
 )
 
-func main(){
-	if len(os.Args)!=2{
-		fmt.Print("error,please try:\n\namcreate build : create a template\namcreate gz : create .tar.gz\n\n")
-		return 
-	}
-	root:=path.Dir(os.Args[0])
-
-	if os.Args[1]=="build"{
-		data,err:=ioutil.ReadFile(root+"/AMfile.yml")
+// Create create template
+func Create(root string) error {
+	data,err:=ioutil.ReadFile(root+"/AMfile.yml")
 		if err!=nil{
-			logs.Error(err)
-			return
+			return err
 		}
 		var am []Template
 		err=yaml.Unmarshal(data,&am)
 		if err!=nil{
-			logs.Error(err)
-			return
+			return err
 		}
 		for _,v :=range am{
+
+			// write vars
 			varsPath,err:=getFilelist(root+"/"+v.VarsDir)
 			if err!=nil{
-				logs.Error(err)
-				return
+				return err
 			}
 			amDir:=v.AmDir
 			err=os.MkdirAll(root+"/"+amDir,0666)
 			if err!=nil{
-				logs.Error(err)
-				return
+				return err
 			}
-			logs.Info(varsPath,"\n")
 			for _,p:=range varsPath{
-				logs.Info(p,"\n")
 				bpath:=strings.Replace(strings.Replace(p,"\\","/",-1),v.VarsDir,amDir+"/vars",1)
-				logs.Info(bpath)
 				err=os.MkdirAll(path.Dir(bpath),0666)
 				if err!=nil{
-					logs.Error(err)
-					return
+					return err
 				}
-				data,err:=template.RefVars(p)
+				data,err:=RefVars(p)
 				if err!=nil{
-					logs.Error(err)
-					return
+					return err
 				}
 				ioutil.WriteFile(bpath,data,0666)
 				if err!=nil{
-					logs.Error(err)
-					return
+					return err
 				}
 			}
-			group,inv,err:=template.GetGroup(root+"/"+v.Inv)
+
+			// write group.yml
+			group,inv,err:=GetGroup(root+"/"+v.Inv)
 			if err!=nil{
-				return
+				return err
 			}
 			inv=inventory+inv
 			err=ioutil.WriteFile(root+"/"+amDir+"/hosts",[]byte(inv),0666)
 			if err!=nil{
-				logs.Error(err)
-				return
+				return err
 			}
+
 			err=ioutil.WriteFile(root+"/"+amDir+"/group.yml",[]byte(group),0666)
 			if err!=nil{
-				logs.Error(err)
-				return
+				return err
 			}
+
+			// write ansible.cfg
 			cfg:=""
 			err=readLine(root+"/"+path.Dir(v.Index)+"/ansible.cfg",func(p string){
 				
@@ -108,19 +93,32 @@ func main(){
 
 			err = ioutil.WriteFile(root+"/"+amDir+"/ansible.cfg",[]byte(cfg),0666)
 			if err!=nil{
-				logs.Error(err)
-				return
+				return err
 			}
+
+			// write tag.yml
 			err = ioutil.WriteFile(root+"/"+amDir+"/tag.yml",[]byte(tag),0666)
 			if err!=nil{
 				logs.Error(err)
-				return
+				return err
 			}
-			err = ioutil.WriteFile(root+"/"+amDir+"/notes.md",[]byte("## "+v.Name),0666)
+
+			// write notes.md
+			notes := []byte("## "+v.Name)
+			if v.Notes != ""{
+				notes,err = ioutil.ReadFile(root+"/"+v.Notes)
+				if err!=nil{
+					logs.Error(err)
+					return err
+				}
+			}
+			err = ioutil.WriteFile(root+"/"+amDir+"/notes.md",notes,0666)
 			if err!=nil{
 				logs.Error(err)
-				return
+				return err
 			}
+
+			// write index.yml
 			for _,in:=range strings.Split(v.AmDir,"/"){
 				if in!=""{
 					v.Index="../"+v.Index
@@ -129,32 +127,10 @@ func main(){
 			err = ioutil.WriteFile(root+"/"+amDir+"/index.yml",[]byte(`- include: "`+v.Index+`"`),0666)
 			if err!=nil{
 				logs.Error(err)
-				return
+				return err
 			}
 		}
-	}
-	
-	if os.Args[1]=="gz"{
-		files :=make([]*os.File,0)
-		dir, err := ioutil.ReadDir(root)
-		if err != nil {
-			return
-		}
-		for _, fi := range dir {
-			f,err:=os.Open(root+"/"+fi.Name())
-			if err!=nil{
-				logs.Error(err)
-				return
-			}
-			files=append(files,f)
-		}
-		
-		err = template.Compress(files,"test.tar.gz")
-		if err!=nil{
-			logs.Error(err)
-			return
-		}
-	}
+		return nil
 }
 
 // Template the struct of AMfile.yml
@@ -201,22 +177,27 @@ var inventory =`{{range $index, $host:=.Hosts}}{{$host.HostName}} ansible_ssh_ho
 {{end}}
 `
 
-func readLine(fileName string, handler func(string)) error {  
-    f, err := os.Open(fileName)  
-    if err != nil {  
-        return err  
-    }  
-    buf := bufio.NewReader(f)  
-    for {  
-        line, err := buf.ReadString('\n')  
-        line = strings.TrimSpace(line)  
-        handler(line)  
-        if err != nil {  
-            if err == io.EOF {  
-                return nil  
-            }  
-            return err  
-        }  
-    }  
-    return nil  
-} 
+
+// GzFile gz root to dest
+func GzFile(root ,dest string) error{
+	files :=make([]*os.File,0)
+	dir, err := ioutil.ReadDir(root)
+	if err != nil {
+		return err
+	}
+	for _, fi := range dir {
+		f,err:=os.Open(root+"/"+fi.Name())
+		if err!=nil{
+			logs.Error(err)
+			return err
+		}
+		files=append(files,f)
+	}
+		
+	err = Compress(files,dest)
+	if err!=nil{
+		logs.Error(err)
+		return err
+	}
+	return nil
+}

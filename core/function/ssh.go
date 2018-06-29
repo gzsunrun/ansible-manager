@@ -7,11 +7,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/paulstuart/ping"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 )
 
 // SshDail ssh auth
 func SshDail(host orm.HostsList) string {
+	netStatus:=ping.Ping(host.IP,5)
+	if !netStatus{
+		return "fail"
+	}
 	if host.Password != "" {
 		res := AuthPassword(host)
 		if res != "success" {

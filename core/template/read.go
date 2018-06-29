@@ -13,6 +13,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/satori/go.uuid"
 	"github.com/gzsunrun/ansible-manager/core/orm"
+	"github.com/gzsunrun/ansible-manager/tools/amcreate/template"
 )
 
 // Template the struct of AMfile.yml
@@ -42,6 +43,18 @@ func ReadVars(filePath string,remotePath string) ([]orm.RepositoryInsert,error) 
 		return repos,err
 	}
 
+	err = template.Create(dir)
+	if err != nil {
+		log.Error(err)
+		return repos,err
+	}
+
+	err = template.GzFile(dir,filePath)
+	if err != nil {
+		log.Error(err)
+		return repos,err
+	}
+	
 	tplByte, err := ioutil.ReadFile(dir + "/AMfile.yml")
 	if err != nil {
 		log.Error(err)

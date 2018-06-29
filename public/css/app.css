@@ -1310,3 +1310,7 @@ fieldset[disabled] .checkbox-custom label {
     font-size: 8px;
     line-height: 1.5;
 }
+
+#parse .form-group{
+    padding: 10px;
+}
