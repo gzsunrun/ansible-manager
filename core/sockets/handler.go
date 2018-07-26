@@ -115,7 +115,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.register <- c
-
+	
+	
 	go c.writePump()
 	go Client(taskID)
 	c.readPump()

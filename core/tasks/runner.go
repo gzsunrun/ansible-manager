@@ -56,8 +56,15 @@ func StopTask(id string) {
 	stopFunc := func(taskID string) {
 		SendLog(taskID, "\nChanged:User Stop\n")
 	}
-	cmdst.StopCmd(id, stopFunc)
+	for k:=range cmdst.cmdTasks{
+		if k==id{
+			cmdst.StopCmd(id, stopFunc)
+			return
+		}
+	}
+	
 }
+
 
 // newTask new a task
 func newTask(taskID string) error {

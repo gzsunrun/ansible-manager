@@ -19,13 +19,14 @@ type TaskController struct {
 func (c *TaskController) List() {
 	defer c.ServeJSON()
 	pid := c.GetString("project_id")
-	var tasks []orm.TaskList
-	err := orm.FindTasks(pid, &tasks)
+	var ts []orm.TaskList
+	err := orm.FindTasks(pid, &ts)
 	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	c.SetResult(nil, tasks, 200)
+
+	c.SetResult(nil, ts, 200)
 }
 
 // Create create  or update a task

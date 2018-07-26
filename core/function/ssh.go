@@ -61,7 +61,6 @@ func AuthPassword(host orm.HostsList) string {
 	})
 
 	if err != nil {
-		fmt.Println(err)
 		if strings.Contains(err.Error(), "unable to authenticate") {
 			return "auth"
 		}
@@ -115,6 +114,7 @@ func AuthKeyByHost(host orm.Hosts) string {
 	})
 
 	if err != nil {
+		fmt.Println(host.IP,host.Password,err)
 		if strings.Contains(err.Error(), "unable to authenticate") {
 			return "auth"
 		}
