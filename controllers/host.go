@@ -88,7 +88,7 @@ func (c *HostController) Create() {
 		c.SetResult(nil, nil, 204)
 		return
 	}
-	host.ID = uuid.Must(uuid.NewV4()).String()
+	host.ID = uuid.NewV4().String()
 	host.UserID = c.GetUid()
 	err := orm.CreateHost(&host)
 	if err != nil {

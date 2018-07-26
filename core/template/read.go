@@ -74,7 +74,7 @@ func ReadVars(filePath string,remotePath string) ([]orm.RepositoryInsert,error) 
 		repo.Name=t.Name+"-"+t.Version
 		repo.Path=remotePath
 		repo.Desc=t.Desc
-		repo.ID=uuid.Must(uuid.NewV4()).String()
+		repo.ID=uuid.NewV4().String()
 		groupY, err := ioutil.ReadFile(tdir + "/group.yml")
 		if err != nil {
 			log.Error(err)

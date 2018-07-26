@@ -33,7 +33,7 @@ func (c *RepoController) List() {
 func (c *RepoController) Create() {
 	defer c.ServeJSON()
 	repo := orm.RepositoryInsert{}
-	repo.ID = uuid.Must(uuid.NewV4()).String()
+	repo.ID = uuid.NewV4().String()
 	f, _, err := c.GetFile("repo_path")
 	if err != nil {
 		log.Error("Getfile", err)
@@ -41,7 +41,7 @@ func (c *RepoController) Create() {
 		return
 	}
 	f.Close()
-	repoPath := uuid.Must(uuid.NewV4()).String()
+	repoPath := uuid.NewV4().String()
 	repo.Path = repoPath
 	err = c.SaveToFile("repo_path", config.Cfg.Common.WorkPath+"/"+repoPath)
 	if err != nil {
@@ -150,9 +150,9 @@ func (c *RepoController) Vars() {
 // SyncGit clone repo from git
 func (c *RepoController) SyncGit() {
 	repo := orm.RepositoryInsert{}
-	repo.ID = uuid.Must(uuid.NewV4()).String()
+	repo.ID = uuid.NewV4().String()
 	repo.Path = c.GetString("git_url")
-	repoPath := uuid.Must(uuid.NewV4()).String()
+	repoPath := uuid.NewV4().String()
 	repoParse := storage.StorageParse{
 		RemotePath: repo.Path,
 		LocalPath:  config.Cfg.Common.WorkPath + "/" + repoPath,

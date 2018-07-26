@@ -32,7 +32,7 @@ func NewNode(ttl int64, port int, path string, worker, master bool) (*Node, erro
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
 				return &Node{
-					NodeID: uuid.Must(uuid.NewV4()).String(),
+					NodeID: uuid.NewV4().String(),
 					IP:     ipnet.IP.String(),
 					TTL:    ttl,
 					Port:   port,

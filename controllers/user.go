@@ -57,7 +57,7 @@ func (c *UserController) Create() {
 			return
 		}
 	} else {
-		user.ID = uuid.Must(uuid.NewV4()).String()
+		user.ID = uuid.NewV4().String()
 		err := orm.AddUser(&user)
 		if err != nil {
 			c.SetResult(err, nil, 400)
