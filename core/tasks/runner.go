@@ -113,7 +113,6 @@ func newTask(taskID string) error {
 		return err
 	}
 	newTask.Path=wp
-	log.Info(wp)
 	newTask.log("ok: finish \n ")
 	err = newTask.runPlaybook()
 	if err != nil {
@@ -133,7 +132,7 @@ func newTask(taskID string) error {
 // runPlaybook run playbook
 func (t *Task) runPlaybook() error {
 	dir :=  workPath + "/repo_" + t.Desc.ID+"/"+t.Path
-	log.Info(dir)
+	log.Info("task %s start use dir: %s",t.Desc.ID,dir)
 	args := make([]string, 0)
 	args = append(args, "-i")
 	args = append(args, dir+"/hosts")

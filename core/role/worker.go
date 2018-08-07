@@ -32,6 +32,7 @@ func WorkerSet() {
 				}
 			}
 		} else {
+			log.Debug("LocalNodeID:",kv.DefaultClient.LocalNode().ID(),"TaskNodeTD:",t.NodeID)
 			if kv.DefaultClient.LocalNode().ID() == t.NodeID {
 				if !t.Timer {
 					tasks.StopTask(t.ID)

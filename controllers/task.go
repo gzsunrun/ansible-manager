@@ -72,6 +72,7 @@ func (c *TaskController) Start() {
 		c.SetResult(err, nil, 400)
 		return
 	}
+	log.Info("user start task %s",task.ID)
 	master := false
 	worker := false
 	for _, node := range kv.DefaultClient.GetStorage().Nodes {
@@ -113,6 +114,7 @@ func (c *TaskController) Stop() {
 		}
 		c.SetResult(nil, nil, 204)
 	}
+	log.Info("task_id:",tid)
 	err := kv.DefaultClient.DeleteTask(tid)
 	if err != nil {
 		c.SetResult(err, nil, 400)
