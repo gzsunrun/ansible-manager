@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 )
 
 // Git git repo

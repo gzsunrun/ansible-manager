@@ -3,7 +3,7 @@ package tasks
 import (
 	"time"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 )

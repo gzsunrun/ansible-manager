@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 	"github.com/ghodss/yaml"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 )

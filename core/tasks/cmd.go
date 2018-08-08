@@ -4,7 +4,7 @@ import (
 	"os/exec"
 	"syscall"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 )
 
 type cmdStruct struct {

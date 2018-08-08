@@ -3,7 +3,7 @@ package orm
 import (
 	"time"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 )
 
 // Timer timer table

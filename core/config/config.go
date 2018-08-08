@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 	"github.com/go-ini/ini"
 )
 

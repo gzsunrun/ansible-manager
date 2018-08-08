@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 	"github.com/minio/minio-go"
 )
 
@@ -25,7 +25,26 @@ func NewS3Storage(url, key, secret, bucket string) (*S3Storage, error) {
 	s3.Key = key
 	s3.Secret = secret
 	s3.Bucket = bucket
-	return s3, nil
+	err:=s3.CreateBuket(bucket)
+	return s3, err
+}
+
+// CreateBuket create s3 buket
+func (s3 *S3Storage) CreateBuket(name string)error{
+	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	res,err:=s3Client.BucketExists(name)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if res{
+		return nil
+	}
+	return s3Client.MakeBucket(name,"us-east-1")
 }
 
 // Put upload file

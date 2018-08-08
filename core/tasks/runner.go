@@ -10,9 +10,8 @@ import (
 	//"strconv"
 	"time"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 	"github.com/gzsunrun/ansible-manager/core/config"
-	//"github.com/gzsunrun/ansible-manager/core/function"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/output"

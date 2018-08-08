@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 	"github.com/gorilla/websocket"
 )
 

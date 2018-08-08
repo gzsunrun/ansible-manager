@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 	"github.com/gorilla/websocket"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 )

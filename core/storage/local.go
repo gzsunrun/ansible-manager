@@ -1,9 +1,10 @@
 package storage
 
 import (
-	log "github.com/astaxie/beego/logs"
 	"io"
 	"os"
+
+	"github.com/hashwing/log"
 )
 
 // LocalStorage local repo

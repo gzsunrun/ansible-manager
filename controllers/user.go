@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/gzsunrun/ansible-manager/core/auth"
 	"github.com/gzsunrun/ansible-manager/core/orm"
-	//log "github.com/astaxie/beego/logs"
 	"github.com/satori/go.uuid"
 )
 

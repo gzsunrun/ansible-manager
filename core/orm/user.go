@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 )
 
 // User user table

@@ -1,25 +1,21 @@
 package config
 
 import (
-	"os"
-	"path/filepath"
-
-	"github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 )
 
-// SetLog config log path
+// SetLog config logger
 func SetLog(path string) error {
-	err := os.MkdirAll(filepath.Dir(path), 0664)
-	if err != nil {
-		logs.Error("fail to create log dir")
+	logger,err:=log.NewBeegoLog(path,7,true)
+	if err!=nil{
+		log.Error("new a logger error:",err)
 		return err
 	}
-	err = logs.SetLogger(logs.AdapterMultiFile, `{"filename":"`+path+`","separate":["error"]}`)
-	if err != nil {
-		logs.Error("fail to config logrus")
-	}
-	logs.EnableFuncCallDepth(true)
-	logs.SetLogFuncCallDepth(3)
-	logs.SetLogger("console")
-	return err
+	log.SetHlogger(logger)
+	return nil
+}
+
+// SetLogger set logger
+func SetLogger(logger log.Hlog){
+	log.SetHlogger(logger)
 }

@@ -4,6 +4,8 @@ go:
   - 1.9.x
 
 before_install:
+    - curl https://glide.sh/get | sh
+    - glide up
 #   - go get github.com/astaxie/beego
 #   - go get github.com/go-ini/ini
 #   - go get github.com/golang/protobuf/ptypes

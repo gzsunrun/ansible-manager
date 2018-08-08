@@ -26,3 +26,4 @@ import:
 - package: github.com/satori/go.uuid
 - package: github.com/takama/daemon
 - package: golang.org/x/crypto/ssh
+- package: github.com/hashwing/log

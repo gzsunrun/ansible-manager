@@ -3,7 +3,7 @@ package controllers
 import (
 	"os"
 
-	log "github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/function"
 	"github.com/gzsunrun/ansible-manager/core/template"

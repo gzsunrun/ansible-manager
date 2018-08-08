@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/hashwing/log"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
@@ -33,7 +33,7 @@ func run() {
 	config.SetLog(LOGPATH)
 	err := config.NewConfig(CONFIGPATH)
 	if err != nil {
-		logs.Error(err)
+		log.Error(err)
 		return
 	}
 	os.MkdirAll(config.Cfg.Common.WorkPath, 0664)
@@ -46,7 +46,7 @@ func run() {
 	go tasks.RunTask()
 	err = kv.SetKVClient()
 	if err != nil {
-		logs.Error(err)
+		log.Error(err)
 		return
 	}
 	role.Run()
@@ -57,7 +57,7 @@ func run() {
 	if config.Cfg.Common.UAPI {
 		err:=asset.RestoreAssets("/var/lib/amgr/","public")
 		if err != nil {
-			logs.Error(err)
+			log.Error(err)
 			return
 		}
 		//beego.SetStaticPath("/ui", "/var/lib/amgr/public/")
