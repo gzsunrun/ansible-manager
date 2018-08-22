@@ -1,0 +1,30 @@
+variables:
+  GIT_STRATEGY: fetch
+  GIT_SUBMODULE_STRATEGY: recursive
+
+
+stages:
+- build
+- dev
+- release
+before_script:
+- ls ./
+
+build_job:
+  stage: build
+  script:
+  - make dockerbuild
+
+dev_job:
+  stage: dev
+  except:
+    - /^release-.*$/
+  script:
+  - make pdevimage
+  
+release_job:
+  stage: release
+  only:
+    - /^release-.*$/
+  script:
+  - make pimage

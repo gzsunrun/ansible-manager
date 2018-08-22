@@ -5,22 +5,7 @@ go:
 
 before_install:
     - curl https://glide.sh/get | sh
-    - glide up
-#   - go get github.com/astaxie/beego
-#   - go get github.com/go-ini/ini
-#   - go get github.com/golang/protobuf/ptypes
-#   - go get google.golang.org/grpc
-#   - go get github.com/coreos/etcd
-#   - go get google.golang.org/genproto/googleapis/rpc/status
-#   - go get github.com/go-sql-driver/mysql
-#   - go get github.com/go-xorm/builder
-#   - go get github.com/go-xorm/xorm
-#   - go get gopkg.in/yaml.v2
-#   - go get github.com/ghodss/yaml
-#   - go get github.com/gorilla/websocket
-#   - go get github.com/minio/go-homedir
-#   - go get github.com/minio/minio-go
-#   - go get github.com/dgrijalva/jwt-go
+    - glide install
 
 script:
   - go build -v
