@@ -1,0 +1,16 @@
+2018/08/03 01:04:01.952 [D] [log_test.go:18]  This is a debug message
+2018/08/03 01:04:01.952 [I] [log_test.go:21]  This is a info message
+2018/08/03 01:04:01.952 [D] [log_test.go:24]  This is a warn message
+2018/08/03 01:04:01.952 [E] [log_test.go:27]  This is a error: <nil>
+2018/08/03 01:04:48.470 [D] [log_test.go:18]  This is a debug message
+2018/08/03 01:04:48.470 [I] [log_test.go:21]  This is a info message
+2018/08/03 01:04:48.470 [D] [log_test.go:24]  This is a warn message
+2018/08/03 01:04:48.470 [E] [log_test.go:27]  This is a error: <nil>
+2018/08/03 01:05:34.073 [D] [log_test.go:18]  This is a debug message
+2018/08/03 01:05:34.073 [I] [log_test.go:21]  This is a info message
+2018/08/03 01:05:34.073 [D] [log_test.go:24]  This is a warn message
+2018/08/03 01:05:34.073 [E] [log_test.go:27]  This is a error: <nil>
+2018/08/03 01:05:54.329 [D] [log_test.go:18]  This is a debug message
+2018/08/03 01:05:54.329 [I] [log_test.go:21]  This is a info message
+2018/08/03 01:05:54.329 [D] [log_test.go:24]  This is a warn message
+2018/08/03 01:05:54.329 [E] [log_test.go:27]  This is a error: <nil>

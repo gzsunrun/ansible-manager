@@ -1,55 +1,42 @@
-# Copyright 2018 The Ansible Manager Authors
-
-# Ensure GOBIN is not set during build so that promu is installed to the correct path
-
 unexport GOBIN
 
-GO           ?= go
-GOFMT        ?= $(GO)fmt
-FIRST_GOPATH := $(firstword $(subst :, ,$(shell $(GO) env GOPATH)))
-PROMU        := $(FIRST_GOPATH)/bin/promu
-STATICCHECK  := $(FIRST_GOPATH)/bin/staticcheck
-GOVENDOR     := $(FIRST_GOPATH)/bin/govendor
-pkgs          = $(shell $(GO) list ./... | grep -v /vendor/)
+NAME         	?= ansible-manager
+GO           	?= go
+SPECE_DIR       ?= ./_rpmbuild
+RPMBUILD_DIR	?= /root/rpmbuild
+VERSION = 2.4.1
+RELEASE = 4
+DOCKERREPO = 192.168.1.100:5000
 
-PREFIX                  ?= $(shell pwd)
-BIN_DIR                 ?= $(shell pwd)
-DOCKER_IMAGE_NAME       ?= ansible-manager
-DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
+all: pkg build
 
-all: format  unused build test
 
-style:
-	@echo ">> checking code style"
-	@! $(GOFMT) -d $(shell find . -path ./vendor -prune -o -name '*.go' -print) | grep '^'
+uppkg:
+	@echo ">> update pkg..."
+	glide --home /root/.glide/ansible-manager/  up
 
-test-short:
-	@echo ">> running short tests"
-	@$(GO) test -short $(shell $(GO) list ./... | grep -v /vendor/ | grep -v examples)
-
-test:
-	@echo ">> running all tests"
-	@$(GO) test -race $(shell $(GO) list ./... | grep -v /vendor/ | grep -v examples)
-
-format:
-	@echo ">> formatting code"
-	@$(GO) fmt $(pkgs)
-
-vet:
-	@echo ">> vetting code"
-	@$(GO) vet $(pkgs)
-
-staticcheck: $(STATICCHECK)
-	@echo ">> running staticcheck"
-	@$(STATICCHECK) -ignore "$(STATICCHECK_IGNORE)" $(pkgs)
-
-unused: $(GOVENDOR)
-	@echo ">> running check for unused packages"
-	@$(GOVENDOR) list +unused
+pkg:
+	@echo ">> get pkg..."
+	glide --home /root/.glide/ansible-manager/  install
 
 build:
-	@echo ">> building binaries"
-	@go-bindata -o=asset/asset.go -pkg=asset public/...
-	@$(GO) build -v
+	@echo ">> building code..."
+	go build -ldflags "-s -w" -o $(NAME)
 
-    
+release:
+	git tag release-$(VERSION)-$(RELEASE)
+
+dockerbuild:
+	@echo ">> build docker image"
+	docker build -t $(DOCKERREPO)/gzsunrun/$(NAME):master .
+
+pimage:
+	@echo ">> push release docker image"
+	docker tag $(DOCKERREPO)/gzsunrun/$(NAME):master $(DOCKERREPO)/gzsunrun/$(NAME):$(VERSION)-$(RELEASE)
+	docker tag $(DOCKERREPO)/gzsunrun/$(NAME):master $(DOCKERREPO)/gzsunrun/$(NAME):latest
+	docker push $(DOCKERREPO)/gzsunrun/$(NAME):$(VERSION)-$(RELEASE)
+	docker push $(DOCKERREPO)/gzsunrun/$(NAME):latest
+
+pdevimage:
+	@echo ">> push dev docker image"
+	docker push  $(DOCKERREPO)/gzsunrun/$(NAME):master
