@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/gzsunrun/ansible-manager/core/orm"
-	"github.com/satori/go.uuid"
+	"github.com/gzsunrun/ansible-manager/core/function"
 )
 
 // ProjectController controller of project.
@@ -20,7 +20,7 @@ func (c *ProjectController) Create() {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	project.ID = uuid.NewV4().String()
+	project.ID = function.NewUuidString()
 	project.UserID = c.GetUid()
 	err := orm.CreateProject(&project)
 	if err != nil {
@@ -45,7 +45,7 @@ func (c *ProjectController) CreateAndAddHosts() {
 		return
 	}
 	if projectHosts.Project.ID == "" {
-		projectHosts.Project.ID = uuid.NewV4().String()
+		projectHosts.Project.ID = function.NewUuidString()
 		projectHosts.Project.UserID = c.GetUid()
 		err := orm.CreateProject(&projectHosts.Project)
 		if err != nil {

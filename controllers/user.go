@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gzsunrun/ansible-manager/core/auth"
 	"github.com/gzsunrun/ansible-manager/core/orm"
-	"github.com/satori/go.uuid"
+	"github.com/gzsunrun/ansible-manager/core/function"
 )
 
 // UserController user controller
@@ -56,7 +56,7 @@ func (c *UserController) Create() {
 			return
 		}
 	} else {
-		user.ID = uuid.NewV4().String()
+		user.ID = function.NewUuidString()
 		err := orm.AddUser(&user)
 		if err != nil {
 			c.SetResult(err, nil, 400)

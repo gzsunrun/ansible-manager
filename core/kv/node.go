@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/satori/go.uuid"
+	"github.com/gzsunrun/ansible-manager/core/function"
 )
 
 // Node node struct
@@ -32,7 +32,7 @@ func NewNode(ttl int64, port int, path string, worker, master bool) (*Node, erro
 		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
 				return &Node{
-					NodeID: uuid.NewV4().String(),
+					NodeID: function.NewUuidString(),
 					IP:     ipnet.IP.String(),
 					TTL:    ttl,
 					Port:   port,

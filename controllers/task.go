@@ -7,7 +7,7 @@ import (
 	"github.com/hashwing/log"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
-	"github.com/satori/go.uuid"
+	"github.com/gzsunrun/ansible-manager/core/function"
 )
 
 // TaskController task controller
@@ -47,7 +47,7 @@ func (c *TaskController) Create() {
 		c.SetResult(nil, task.ID, 200, "task_id")
 		return
 	}
-	task.ID = uuid.NewV4().String()
+	task.ID = function.NewUuidString()
 	task.Status = "created"
 	err := orm.CreateTask(&task)
 	if err != nil {

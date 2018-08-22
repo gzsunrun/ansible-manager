@@ -6,7 +6,6 @@ import (
 
 	"github.com/gzsunrun/ansible-manager/core/function"
 	"github.com/gzsunrun/ansible-manager/core/orm"
-	"github.com/satori/go.uuid"
 )
 
 //HostController host controller
@@ -88,7 +87,7 @@ func (c *HostController) Create() {
 		c.SetResult(nil, nil, 204)
 		return
 	}
-	host.ID = uuid.NewV4().String()
+	host.ID = function.NewUuidString()
 	host.UserID = c.GetUid()
 	err := orm.CreateHost(&host)
 	if err != nil {

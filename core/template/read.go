@@ -11,8 +11,8 @@ import (
 
 	"github.com/hashwing/log"
 	"github.com/ghodss/yaml"
-	"github.com/satori/go.uuid"
 	"github.com/gzsunrun/ansible-manager/core/orm"
+	"github.com/gzsunrun/ansible-manager/core/function"
 	"github.com/gzsunrun/ansible-manager/tools/amcreate/template"
 )
 
@@ -74,7 +74,7 @@ func ReadVars(filePath string,remotePath string) ([]orm.RepositoryInsert,error) 
 		repo.Name=t.Name+"-"+t.Version
 		repo.Path=remotePath
 		repo.Desc=t.Desc
-		repo.ID=uuid.NewV4().String()
+		repo.ID=function.NewUuidString()
 		groupY, err := ioutil.ReadFile(tdir + "/group.yml")
 		if err != nil {
 			log.Error(err)

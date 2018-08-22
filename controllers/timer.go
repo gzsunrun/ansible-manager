@@ -7,7 +7,7 @@ import (
 	"github.com/hashwing/log"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
-	"github.com/satori/go.uuid"
+	"github.com/gzsunrun/ansible-manager/core/function"
 )
 
 // TimerController timer controller
@@ -53,7 +53,7 @@ func (c *TimerController) Create() {
 		c.SetResult(nil, nil, 204)
 		return
 	}
-	timer.ID = uuid.NewV4().String()
+	timer.ID = function.NewUuidString()
 	err := orm.CreateTimer(&timer)
 	if err != nil {
 		c.SetResult(err, nil, 400)
