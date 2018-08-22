@@ -1,0 +1,48 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ansible-manager
+  namespace: default  
+  labels:
+    app: ansible-manager
+    version: v1
+data:
+  ansible_manager.conf : |-
+    [common]
+    port=8090
+    concurrent=5
+    work_path=/tmp/ansible-manager
+    master_enable=true
+    worker_enable=true
+    uapi_enable=true
+    node_timeout=10
+
+
+    [mysql]
+    mysql_url=10.21.1.178:3306
+    mysql_name=playbook
+    mysql_user=root
+    mysql_password=123456
+
+    [local_storage]
+    enable=true
+    storage_dir=/opt/ansible-manager/repo/
+
+
+    [s3_storage]
+    enable=false
+    s3_endpoint=10.21.1.234:8080
+    s3_key=V7TRJJ6RMA8SWKDZEW6X
+    s3_secret=cNaO54RUWpDypOIuLGDJAIrqeq1vXeQ2QvZzLHMV
+    bucket_name=ansible-playbook
+
+    [git_storage]
+    enable=false
+
+    [file_log]
+    enable=true
+    log_dir=/opt/ansible-manager/log/
+
+    [etcd]
+    enable=false
+    endpoints=10.21.1.178:2379
