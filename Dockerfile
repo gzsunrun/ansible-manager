@@ -24,4 +24,4 @@ ENV PATH=$PATH:/usr/local/bin
 
 WORKDIR /usr/local/bin
 
-CMD ["./sunruniaas-ansible"]
+CMD ["./ansible-manager"]

@@ -3,9 +3,5 @@ language: go
 go:
   - 1.9.x
 
-before_install:
-    - curl https://glide.sh/get | sh
-    - glide install
-
 script:
   - go build -v
