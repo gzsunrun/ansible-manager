@@ -8,7 +8,7 @@ VERSION = 2.4.1
 RELEASE = 4
 DOCKERREPO = 192.168.1.100:5000
 
-all: pkg build
+all: pkg bindata build
 
 
 uppkg:
@@ -19,9 +19,14 @@ pkg:
 	@echo ">> get pkg..."
 	glide --home /root/.glide/ansible-manager/  install
 
+bindata:
+	@echo ">> bindata .."
+	@go-bindata -o=asset/asset.go -pkg=asset public/...
+
 build:
 	@echo ">> building code..."
 	go build -ldflags "-s -w" -o $(NAME)
+
 
 release:
 	git tag release-$(VERSION)-$(RELEASE)
