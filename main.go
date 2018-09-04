@@ -54,13 +54,14 @@ func run() {
 	beego.BConfig.RunMode = beego.PROD
 	beego.BConfig.CopyRequestBody = true
 	beego.BConfig.Log.FileLineNum = true
+	beego.BConfig.WebConfig.DirectoryIndex=true
 	if config.Cfg.Common.UAPI {
 		err:=asset.RestoreAssets("/var/lib/amgr/","public")
 		if err != nil {
 			log.Error(err)
 			return
 		}
-		beego.SetStaticPath("/ui", "/var/lib/amgr/public/")
+		beego.SetStaticPath("/ui", "/var/lib/amgr/public")
 		//beego.SetStaticPath("/ui", "./public/") 
 	}
 	beego.BConfig.Listen.HTTPPort = config.Cfg.Common.Port
