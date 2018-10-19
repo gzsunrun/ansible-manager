@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ansible-manager
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ansible-manager
+        version: v1 
+    spec:
+      containers:
+      - name: ansible-manager
+        image: gzsunrun/ansible-manager:master
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/ansible-manager
+      volumes:
+        - name: config-volume
+          configMap:
+            name: ansible-manager
+            items:
+            - key: ansible_manager.conf
+              path: ansible-manager.conf
