@@ -23,6 +23,7 @@ type Repository struct {
 type RepositoryInsert struct {
 	ID      string                   `xorm:"repo_id" json:"repo_id"`
 	Name    string                   `xorm:"repo_name" json:"repo_name"`
+	Version string                   `xorm:"repo_version" json:"repo_version"`
 	Path    string                   `xorm:"repo_path" json:"repo_path"`
 	Group   []map[string]interface{} `xorm:"repo_group" json:"repo_group"`
 	Tag     []map[string]interface{} `xorm:"repo_tags" json:"repo_tags"`
@@ -69,7 +70,7 @@ func GetRepoByID(id string, repo interface{}) error {
 }
 
 // GetRepoByPath  repo exit by path
-func GetRepoByPath(path string) (res bool){
+func GetRepoByPath(path string) (res bool) {
 	var repo Repository
 	res, err := MysqlDB.Table("ansible_repository").Where("repo_path=?", path).Get(&repo)
 	if err != nil {
@@ -80,19 +81,19 @@ func GetRepoByPath(path string) (res bool){
 }
 
 // GetRepoByName get repo by name
-func GetRepoByName(name string)(*Repository,bool,error) {
+func GetRepoByName(name string) (*Repository, bool, error) {
 	var repo Repository
 	res, err := MysqlDB.Table("ansible_repository").Where("repo_name=?", name).Get(&repo)
 	if err != nil {
 		log.Error(err)
-		return nil,false,err
+		return nil, false, err
 	}
-	return &repo,res,nil
+	return &repo, res, nil
 }
 
 // FindRepos find all repos
 func FindRepos(repos interface{}) error {
-	err := MysqlDB.Table("ansible_repository").Find(repos)
+	err := MysqlDB.Table("ansible_repository").OrderBy("repo_name asc").Find(repos)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -111,23 +112,23 @@ func CreateRepo(repo RepositoryInsert) error {
 
 // CreateRepos insert repo into table
 func CreateRepos(repos []RepositoryInsert) error {
-	session:=MysqlDB.NewSession()
-	for _,v:=range repos{
-		_,res,err:=GetRepoByName(v.Name)
-		if err!=nil{
+	session := MysqlDB.NewSession()
+	for _, v := range repos {
+		_, res, err := GetRepoByName(v.Name)
+		if err != nil {
 			return err
 		}
-		if res{
-			log.Error(v.Name,"playbook is exit")
-		}else{
-			_,err:=session.Table("ansible_repository").Insert(v)
-			if err!=nil{
+		if res {
+			log.Error(v.Name, "playbook is exit")
+		} else {
+			_, err := session.Table("ansible_repository").Insert(v)
+			if err != nil {
 				log.Error(err)
 				return err
-			}	
+			}
 		}
 	}
-	err:=session.Commit()
+	err := session.Commit()
 	// _, err := MysqlDB.Table("ansible_repository").Insert(&repos)
 	if err != nil {
 		log.Error(err)

@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"errors"
+
 	"github.com/astaxie/beego"
 )
 
@@ -36,4 +38,13 @@ func (c *BaseController) SetResult(err error, result interface{}, errcode int, k
 	} else {
 		c.Data["json"] = map[string]interface{}{key[0]: result}
 	}
+}
+
+// SetErrMsg return err msg to http
+func (c *BaseController) SetErrMsg(code int, msg string) {
+	errMsg := ErrorMsg{
+		Code:    code,
+		Message: msg,
+	}
+	c.SetResult(errors.New("err"), errMsg, code)
 }

@@ -3,12 +3,12 @@ package controllers
 import (
 	"os"
 
-	"github.com/hashwing/log"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/function"
-	"github.com/gzsunrun/ansible-manager/core/template"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/storage"
+	"github.com/gzsunrun/ansible-manager/core/template"
+	"github.com/hashwing/log"
 )
 
 // RepoController repo controller
@@ -45,7 +45,7 @@ func (c *RepoController) Create() {
 	err = c.SaveToFile("repo_path", config.Cfg.Common.WorkPath+"/"+repoPath)
 	if err != nil {
 		log.Error(err)
-		c.SetResult(err, nil, 400)
+		c.SetErrMsg(400, err.Error())
 		return
 	}
 	defer os.Remove(config.Cfg.Common.WorkPath + "/" + repoPath)
@@ -55,9 +55,9 @@ func (c *RepoController) Create() {
 	// 	c.SetResult(err, nil, 400)
 	// 	return
 	// }
-	tpls,err:=template.ReadVars(config.Cfg.Common.WorkPath+"/"+repoPath,repoPath)
+	tpls, err := template.ReadVars(config.Cfg.Common.WorkPath+"/"+repoPath, repoPath)
 	if err != nil {
-		c.SetResult(err, nil, 400)
+		c.SetErrMsg(400, err.Error())
 		return
 	}
 
@@ -75,22 +75,22 @@ func (c *RepoController) Create() {
 		}
 		err = storage.Storage.Put(&logoParse)
 		if err != nil {
-			c.SetResult(err, nil, 400)
+			c.SetErrMsg(500, err.Error())
 			return
 		}
-	} 
+	}
 	repoParse := storage.StorageParse{
 		LocalPath:  config.Cfg.Common.WorkPath + "/" + repoPath,
 		RemotePath: repoPath,
 	}
 	err = storage.Storage.Put(&repoParse)
 	if err != nil {
-		c.SetResult(err, nil, 400)
+		c.SetErrMsg(500, err.Error())
 		return
 	}
 	err = orm.CreateRepos(tpls)
 	if err != nil {
-		c.SetResult(err, nil, 400)
+		c.SetErrMsg(500, err.Error())
 		return
 	}
 	// err = orm.CreateRepo(repo)
@@ -115,7 +115,7 @@ func (c *RepoController) Delete() {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	if !orm.GetRepoByPath(repo.Path){
+	if !orm.GetRepoByPath(repo.Path) {
 		logoParse := storage.StorageParse{
 			RemotePath: repo.Path + ".png",
 		}

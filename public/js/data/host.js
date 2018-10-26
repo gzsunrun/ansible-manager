@@ -85,6 +85,7 @@ function EditHost() {
         host_alias: $('#host-alias').val(),
         host_name: $('#host-name').val(),
         host_ip: $('#host-ip').val(),
+        host_port: $('#host-port').val(),
         host_user: $('#host-user').val(),
         host_password: $('#host-password').val(),
         host_key: $('#host-key').val()
@@ -96,6 +97,7 @@ function EditHost() {
         function () { },
         function () {
             GetHostList()
+            GetHostStatus()
             ReqSuccess()
             CleanHostForm()
             $('#host-modal').modal('hide');
@@ -113,6 +115,7 @@ function DelHost(id) {
         function () { },
         function () {
             GetHostList()
+            GetHostStatus()
             ReqSuccess()
         },
         ReqErr
@@ -131,6 +134,7 @@ function GetHost(id){
             $('#host-alias').val(msg.host_alias)
             $('#host-name').val(msg.host_name)
             $('#host-ip').val(msg.host_ip)
+            $('#host-port').val(msg.host_port)
             $('#host-user').val(msg.host_user)
             $('#host-password').val(""),
             $('#host-key').val("")
@@ -145,6 +149,7 @@ function CleanHostForm(){
     $('#host-alias').val("")
     $('#host-name').val("")
     $('#host-ip').val("")
+    $('#host-port').val("22")
     $('#host-user').val("")
     $('#host-password').val(""),
     $('#host-key').val("")

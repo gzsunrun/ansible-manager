@@ -84,7 +84,7 @@ function CreateRepo(){
                 $("#upload").removeClass("disabled")
                 GetRepoList()    
             }else{
-                new $.zui.Messager("上传失败", {
+                new $.zui.Messager("上传失败:"+xhr.responseText, {
                         type: 'danger' 
                         }).show();
                 $("#upload").removeClass("disabled")

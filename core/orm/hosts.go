@@ -13,6 +13,7 @@ type Hosts struct {
 	Alias    string    `xorm:"host_alias" json:"host_alias"`
 	HostName string    `xorm:"host_name" json:"host_name"`
 	IP       string    `xorm:"host_ip" json:"host_ip"`
+	Port     string    `xorm:"host_port" json:"host_port"`
 	User     string    `xorm:"host_user" json:"host_user"`
 	Password string    `xorm:"host_password" json:"host_password"`
 	Key      string    `xorm:"host_key" json:"host_key"`
@@ -27,6 +28,7 @@ type HostsList struct {
 	Alias    string    `xorm:"host_alias" json:"host_alias"`
 	HostName string    `xorm:"host_name" json:"host_name"`
 	IP       string    `xorm:"host_ip" json:"host_ip"`
+	Port     string    `xorm:"host_port" json:"host_port"`
 	User     string    `xorm:"host_user" json:"-"`
 	Password string    `xorm:"host_password" json:"-"`
 	Key      string    `xorm:"host_key" json:"-"`
@@ -108,6 +110,7 @@ func UPdateHost(host *Hosts) error {
 	}
 	return err
 }
+
 // UPdateNullHost update host enve if filed is null
 func UPdateNullHost(host *Hosts) error {
 	if host.Password != "" {
@@ -171,7 +174,7 @@ func UPdateAuthHost(host *Hosts) error {
 
 // FindHosts find hosts
 func FindHosts(uid string, hosts *[]HostsList) error {
-	err := MysqlDB.Table("ansible_host").Where("user_id=?", uid).Find(hosts)
+	err := MysqlDB.Table("ansible_host").OrderBy("host_name asc").Where("user_id=?", uid).Find(hosts)
 	if err != nil {
 		log.Error(err)
 		return err

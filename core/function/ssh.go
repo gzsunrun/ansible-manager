@@ -2,19 +2,20 @@ package function
 
 import (
 	"fmt"
-	"golang.org/x/crypto/ssh"
 	"net"
 	"strings"
 	"time"
 
-	"github.com/paulstuart/ping"
+	"golang.org/x/crypto/ssh"
+
 	"github.com/gzsunrun/ansible-manager/core/orm"
+	"github.com/paulstuart/ping"
 )
 
 // SshDail ssh auth
 func SshDail(host orm.HostsList) string {
-	netStatus:=ping.Ping(host.IP,5)
-	if !netStatus{
+	netStatus := ping.Ping(host.IP, 5)
+	if !netStatus {
 		return "fail"
 	}
 	if host.Password != "" {
@@ -51,13 +52,13 @@ func AuthPassword(host orm.HostsList) string {
 	authMethods = append(authMethods, ssh.KeyboardInteractive(keyboardInteractiveChallenge))
 	authMethods = append(authMethods, ssh.Password(host.Password))
 
-	c, err := ssh.Dial("tcp", host.IP+":22", &ssh.ClientConfig{
+	c, err := ssh.Dial("tcp", host.IP+":"+host.Port, &ssh.ClientConfig{
 		User:    host.User,
 		Auth:    authMethods,
 		Timeout: 3 * time.Second,
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-            return nil
-        },
+			return nil
+		},
 	})
 
 	if err != nil {
@@ -79,13 +80,13 @@ func AuthKey(host orm.HostsList) string {
 	if host.User == "" {
 		host.User = "root"
 	}
-	c, err := ssh.Dial("tcp", host.IP+":22", &ssh.ClientConfig{
+	c, err := ssh.Dial("tcp", host.IP+":"+host.Port, &ssh.ClientConfig{
 		User:    host.User,
 		Auth:    []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		Timeout: 3 * time.Second,
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-            return nil
-        },
+			return nil
+		},
 	})
 
 	if err != nil {
@@ -104,17 +105,17 @@ func AuthKeyByHost(host orm.Hosts) string {
 	if err != nil {
 		return "fail"
 	}
-	c, err := ssh.Dial("tcp", host.IP+":22", &ssh.ClientConfig{
+	c, err := ssh.Dial("tcp", host.IP+":"+host.Port, &ssh.ClientConfig{
 		User:    host.User,
 		Auth:    []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		Timeout: 3 * time.Second,
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-            return nil
-        },
+			return nil
+		},
 	})
 
 	if err != nil {
-		fmt.Println(host.IP,host.Password,err)
+		fmt.Println(host.IP, host.Password, err)
 		if strings.Contains(err.Error(), "unable to authenticate") {
 			return "auth"
 		}
