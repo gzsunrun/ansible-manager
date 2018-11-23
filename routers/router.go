@@ -52,6 +52,8 @@ func init() {
 		beego.NSRouter("/task/del", &controllers.TaskController{}, "get:Del"),
 		beego.NSRouter("/task/notes", &controllers.TaskController{}, "get:GetNotes"),
 		beego.NSRouter("/task/count", &controllers.TaskController{}, "get:GetTaskCount"),
+		beego.NSRouter("/task/ytoj", &controllers.TaskController{}, "post:YAMLToJSON"),
+		beego.NSRouter("/task/jtoy", &controllers.TaskController{}, "post:JSONToYAML"),
 		beego.NSRouter("/nodes", &controllers.TaskController{}, "get:GetNodes"),
 		beego.NSRouter("/timer/create", &controllers.TimerController{}, "post:Create"),
 		beego.NSRouter("/timer/list", &controllers.TimerController{}, "get:List"),

@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"html/template"
 
-	"github.com/hashwing/log"
+	"github.com/ghodss/yaml"
+	"github.com/gzsunrun/ansible-manager/core/function"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
-	"github.com/gzsunrun/ansible-manager/core/function"
+	"github.com/hashwing/log"
 )
 
 // TaskController task controller
@@ -72,7 +73,7 @@ func (c *TaskController) Start() {
 		c.SetResult(err, nil, 400)
 		return
 	}
-	log.Info("user start task %s",task.ID)
+	log.Info("user start task %s", task.ID)
 	master := false
 	worker := false
 	for _, node := range kv.DefaultClient.GetStorage().Nodes {
@@ -114,7 +115,7 @@ func (c *TaskController) Stop() {
 		}
 		c.SetResult(nil, nil, 204)
 	}
-	log.Info("task_id:",tid)
+	log.Info("task_id:", tid)
 	err := kv.DefaultClient.DeleteTask(tid)
 	if err != nil {
 		c.SetResult(err, nil, 400)
@@ -262,4 +263,33 @@ func (c *TaskController) GetNodes() {
 		nodes = append(nodes, node)
 	}
 	c.SetResult(nil, nodes, 200)
+}
+
+// JSONToYAML json to yaml
+func (c *TaskController) JSONToYAML() {
+	defer c.ServeJSON()
+
+	data, err := yaml.JSONToYAML(c.Ctx.Input.RequestBody)
+	if err != nil {
+		c.SetErrMsg(500, "转化错误:"+err.Error())
+		return
+	}
+	c.SetResult(nil, string(data), 200, "yaml")
+}
+
+// YAMLToJSON json to yaml
+func (c *TaskController) YAMLToJSON() {
+	defer c.ServeJSON()
+	data, err := yaml.YAMLToJSON(c.Ctx.Input.RequestBody)
+	if err != nil {
+		c.SetErrMsg(500, "转化错误:"+err.Error())
+		return
+	}
+	var res interface{}
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		c.SetErrMsg(500, "转化错误:"+err.Error())
+		return
+	}
+	c.SetResult(nil, res, 200)
 }

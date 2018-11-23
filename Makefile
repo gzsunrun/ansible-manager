@@ -5,7 +5,7 @@ GO           	?= go
 SPECE_DIR       ?= ./_rpmbuild
 RPMBUILD_DIR	?= /root/rpmbuild
 VERSION = 2.4.1
-RELEASE = 4
+RELEASE = 5
 DOCKERREPO = 192.168.1.100:5000
 
 all: pkg bindata build

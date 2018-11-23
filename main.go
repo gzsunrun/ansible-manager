@@ -4,7 +4,8 @@ import (
 	"os"
 
 	"github.com/astaxie/beego"
-	"github.com/hashwing/log"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/gzsunrun/ansible-manager/asset"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
@@ -12,9 +13,8 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/sockets"
 	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/tasks"
-	"github.com/gzsunrun/ansible-manager/asset"
-	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/gzsunrun/ansible-manager/routers"
+	"github.com/hashwing/log"
 )
 
 const (
@@ -23,9 +23,9 @@ const (
 	// SERVICEDESC service desc
 	SERVICEDESC = "ansible-manager"
 	// LOGPATH log file path
-	LOGPATH     = "/var/log/ansible-manager/log.log"
+	LOGPATH = "/var/log/ansible-manager/log.log"
 	// CONFIGPATH config file path
-	CONFIGPATH  = "/etc/ansible-manager/ansible-manager.conf"
+	CONFIGPATH = "/etc/ansible-manager/ansible-manager.conf"
 )
 
 // run start process
@@ -54,15 +54,15 @@ func run() {
 	beego.BConfig.RunMode = beego.PROD
 	beego.BConfig.CopyRequestBody = true
 	beego.BConfig.Log.FileLineNum = true
-	beego.BConfig.WebConfig.DirectoryIndex=true
+	beego.BConfig.WebConfig.DirectoryIndex = true
 	if config.Cfg.Common.UAPI {
-		err:=asset.RestoreAssets("/var/lib/amgr/","public")
+		err := asset.RestoreAssets("/var/lib/amgr/", "public")
 		if err != nil {
 			log.Error(err)
 			return
 		}
 		beego.SetStaticPath("/ui", "/var/lib/amgr/public")
-		//beego.SetStaticPath("/ui", "./public/") 
+		//beego.SetStaticPath("/ui", "./public/")
 	}
 	beego.BConfig.Listen.HTTPPort = config.Cfg.Common.Port
 	beego.Run()

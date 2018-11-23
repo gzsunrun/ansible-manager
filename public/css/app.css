@@ -1314,3 +1314,11 @@ fieldset[disabled] .checkbox-custom label {
 #parse .form-group{
     padding: 10px;
 }
+
+.vars-name{
+    background: #039BE5;
+    padding: 3px;
+    width: 100%;
+    color: #ddd;
+    font-size: 15px;
+}

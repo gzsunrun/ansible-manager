@@ -412,6 +412,7 @@ function createInvJSON(){
 	return obj
 }
 
+var JsonM=new(Array)
 function createVarsView(){
 	$("#parse").empty()
 	
@@ -430,15 +431,15 @@ function createVarsView(){
  	// 	}); 
 	// })
 
-	var JsonM=new(Array)
 	$.each(TASKVARS.task_vars,function(i,v){
 		$("#parse").append( `
+			<label class="group-name"><a class="group-name" id="editor2-title-`+i+`" href="#">`+v.vars_path+`</a></label>
 			<div id="editor2-`+i+`" class="json-editor"></div> 
 		</div>`)
 		var editor2 = new JSONEditor(document.getElementById('editor2-'+i),{
 			schema: {
 			  type: "object",
-			  title: v.vars_name,
+			  title: " ",
 			  properties: v.vars_value.struct
 			},
 			startval: v.vars_value.vars,
@@ -450,7 +451,13 @@ function createVarsView(){
 		  JsonM[i]=editor2
 		  JsonM[i].on('change',function() {
 			TASKVARS.task_vars[i].vars_value.vars=editor2.getValue()
-		});
+			});
+		$("#editor2-title-"+i).click(function(){
+			console.log(editor2.getValue())
+			$("#path-title").text(v.vars_path)
+			$("#path-id").val(i)
+			json2yaml(editor2.getValue())
+		})
 	})
 	
 	// $.each(TASKVARS.task_vars,function(i,v){
@@ -463,6 +470,40 @@ function createVarsView(){
 	// 	</div>`)
 	// })
 	//$(".inv-attr").hide()
+}
+
+function json2yaml(data){
+	AjaxReq(
+        "post",
+        "../ansible/common/task/jtoy",
+        JSON.stringify(data),
+        function () { },
+        function(res){
+			console.log(res)
+			editor.setValue(res.yaml+"\n\n\n\n\n\n\n\n\n\n");
+			editor.setCursor(2);
+			$("#editor-modal").modal("show")
+		},
+        ReqErr
+    );
+}
+
+function yamltojson(){
+	var data = editor.getValue()
+	AjaxReq(
+        "post",
+        "../ansible/common/task/ytoj",
+        data,
+        function () { },
+        function(res){
+			console.log(res)
+			var i=$("#path-id").val()
+			JsonM[i].setValue(res)
+			TASKVARS.task_vars[i].vars_value.vars=res
+			$("#editor-modal").modal("hide")
+		},
+        ReqErr
+    );
 }
 
 function onCheck(){
