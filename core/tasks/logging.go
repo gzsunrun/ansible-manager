@@ -3,12 +3,13 @@ package tasks
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os/exec"
 
-	"github.com/hashwing/log"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/output"
 	"github.com/gzsunrun/ansible-manager/core/sockets"
+	"github.com/hashwing/log"
 )
 
 // Task task struct
@@ -46,6 +47,7 @@ func (t *Task) updateStatus() {
 	if err != nil {
 		panic(err)
 	}
+	t.LO.Write(fmt.Sprintf("start: %v\nend: %v\nstatus: %s\n", t.Desc.Start, t.Desc.End, t.Desc.Status))
 	orm.UpdateTask(&t.Desc)
 	sockets.Message(t.Desc.ID, b)
 }

@@ -1,12 +1,14 @@
 package sockets
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/hashwing/log"
 	"github.com/gorilla/websocket"
+	"github.com/gzsunrun/ansible-manager/core/output"
+	"github.com/hashwing/log"
 )
 
 var upgrader = websocket.Upgrader{
@@ -115,9 +117,32 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.register <- c
-	
-	
+
 	go c.writePump()
+	lo, err := output.NewLogOutput(taskID)
+	if err != nil {
+		log.Error(err)
+	}
+	data, err := lo.Read()
+	if err != nil {
+		log.Error(err)
+	}
+	for _, msg := range data {
+		b, err := json.Marshal(&map[string]interface{}{
+			"type":    "log",
+			"output":  msg,
+			"task_id": taskID,
+		})
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		err = c.ws.WriteMessage(websocket.TextMessage, b)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+
 	go Client(taskID)
 	c.readPump()
 }

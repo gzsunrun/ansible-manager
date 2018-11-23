@@ -7,10 +7,10 @@ import (
 	//"io/ioutil"
 	"os"
 	"os/exec"
+
 	//"strconv"
 	"time"
 
-	"github.com/hashwing/log"
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
@@ -18,6 +18,7 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/sockets"
 	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/template"
+	"github.com/hashwing/log"
 )
 
 var workPath string
@@ -55,15 +56,14 @@ func StopTask(id string) {
 	stopFunc := func(taskID string) {
 		SendLog(taskID, "\nChanged:User Stop\n")
 	}
-	for k:=range cmdst.cmdTasks{
-		if k==id{
+	for k := range cmdst.cmdTasks {
+		if k == id {
 			cmdst.StopCmd(id, stopFunc)
 			return
 		}
 	}
-	
-}
 
+}
 
 // newTask new a task
 func newTask(taskID string) error {
@@ -77,6 +77,9 @@ func newTask(taskID string) error {
 	if err != nil {
 		log.Error(err)
 	}
+	defer lo.Close()
+	lo.Clean()
+
 	newTask := new(Task)
 	newTask.Desc = task
 	newTask.LO = lo
@@ -104,14 +107,14 @@ func newTask(taskID string) error {
 	newTask.log("ok: finish \n ")
 	newTask.log("[INSTALL HOSTS AND VARS]")
 	//err = newTask.installVars()
-	wp,err := template.InstallVars(&(newTask.Desc), workPath+"/repo_"+newTask.Desc.ID)
+	wp, err := template.InstallVars(&(newTask.Desc), workPath+"/repo_"+newTask.Desc.ID)
 	if err != nil {
 		log.Error(err)
 		newTask.log("fatal: error \n ")
 		newTask.Desc.Status = "error"
 		return err
 	}
-	newTask.Path=wp
+	newTask.Path = wp
 	newTask.log("ok: finish \n ")
 	err = newTask.runPlaybook()
 	if err != nil {
@@ -130,8 +133,8 @@ func newTask(taskID string) error {
 
 // runPlaybook run playbook
 func (t *Task) runPlaybook() error {
-	dir :=  workPath + "/repo_" + t.Desc.ID+"/"+t.Path
-	log.Info("task %s start use dir: %s",t.Desc.ID,dir)
+	dir := workPath + "/repo_" + t.Desc.ID + "/" + t.Path
+	log.Info("task %s start use dir: %s", t.Desc.ID, dir)
 	args := make([]string, 0)
 	args = append(args, "-i")
 	args = append(args, dir+"/hosts")
