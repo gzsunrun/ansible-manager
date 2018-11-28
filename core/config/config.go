@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hashwing/log"
 	"github.com/go-ini/ini"
+	"github.com/hashwing/log"
 )
 
 // Config config strcut
@@ -18,6 +18,7 @@ type Config struct {
 	Git          Git          `ini:"git_storage"`
 	Etcd         Etcd         `ini:"etcd"`
 	FileLog      FileLog      `ini:"file_log"`
+	Harbor       Harbor       `ini:"harbor"`
 }
 
 // Common common config
@@ -69,6 +70,11 @@ type Etcd struct {
 type FileLog struct {
 	Enable bool   `ini:"enable"`
 	Path   string `ini:"log_dir"`
+}
+
+type Harbor struct {
+	URL  string `ini:"url"`
+	Repo string `ini:"repo"`
 }
 
 // Cfg defualt config

@@ -23,14 +23,29 @@ function GetRepoList() {
     var success = function (msg) {
         $("#repo-list").empty()
         $.each(msg, function (i, val) {
-            var html = `<tr>
-            <td>`+ val.repo_id + `</td>
-            <td>`+ val.repo_name + `</td>
-            <td>`+ val.created + `</td>
-            <td>
-                <a href="javascript:DelRepo('`+val.repo_id+`');" class="btn btn-xs btn-danger">删除</a>
-            </td>
-        </tr>`
+
+        var html =`<div class="col-md-4 col-sm-6 col-lg-3">
+        <span class="card">
+            <a href="###">
+                <p style="margin: 0 auto; width: 157px; height: 157px">
+                    <img width="100%" height="100%"onerror='this.src="img/default.png"' src="../ansible/static/icon?id=`+val.repo_path+`" title="点击部署">
+                </p>
+            </a>
+            <div class="card-heading">
+                    <strong>`+ val.repo_name + `</strong>
+                    <select  id="exampleInputAddress7">
+                        <option>`+ val.repo_version + `</option>
+                    </select>
+            </div>
+            <div class="card-content text-muted" style="height:60px;">`+ val.repo_desc + `</div>
+            <div class="card-actions">
+               <button type="button" class="btn"><i class="icon-play-circle"></i> 部署</button>
+                <div class="pull-right text-danger">
+                        <a class="text-danger" href="javascript:DelRepo('`+val.repo_id+`');"><i class="icon icon-trash"></i> 删除</a>
+                </div>
+            </div>
+        </span>
+    </div>`
             $('#repo-list').append(html)
         })
     };
@@ -38,7 +53,7 @@ function GetRepoList() {
     AjaxReq(
         "get",
         "../ansible/common/repo",
-        {},
+        {repo_type:$("#repo-type").val()},
         function () { },
         success,
         ReqErr
@@ -69,6 +84,7 @@ function CreateRepo(){
     var fd = new FormData();
     fd.append("repo_path",$('#repo-path')[0].files[0]);
     fd.append("repo_name",$("#repo-name").val());
+    fd.append("repo_type",$("#repo-type").val());
     fd.append("repo_desc",$("#repo-desc").val());
     var xhr = new XMLHttpRequest();
     if ( xhr.upload ) {

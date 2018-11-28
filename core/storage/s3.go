@@ -1,8 +1,10 @@
 package storage
 
 import (
+	"io/ioutil"
 	"net"
 	"net/url"
+	"path"
 	"strings"
 	"time"
 
@@ -25,26 +27,26 @@ func NewS3Storage(url, key, secret, bucket string) (*S3Storage, error) {
 	s3.Key = key
 	s3.Secret = secret
 	s3.Bucket = bucket
-	err:=s3.CreateBuket(bucket)
+	err := s3.CreateBuket(bucket)
 	return s3, err
 }
 
 // CreateBuket create s3 buket
-func (s3 *S3Storage) CreateBuket(name string)error{
+func (s3 *S3Storage) CreateBuket(name string) error {
 	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	res,err:=s3Client.BucketExists(name)
+	res, err := s3Client.BucketExists(name)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	if res{
+	if res {
 		return nil
 	}
-	return s3Client.MakeBucket(name,"us-east-1")
+	return s3Client.MakeBucket(name, "us-east-1")
 }
 
 // Put upload file
@@ -114,4 +116,28 @@ func (s3 *S3Storage) Share(repo *StorageParse) (string, error) {
 		return "", err
 	}
 	return presignedURL.String(), nil
+}
+
+func (s3 *S3Storage) GetIO(repo *StorageParse) ([]byte, string, error) {
+	s3Client, err := minio.NewV2(s3.URL, s3.Key, s3.Secret, false)
+	if err != nil {
+		log.Error(err)
+		return nil, "", err
+	}
+	doneCh := make(chan struct{})
+	defer close(doneCh)
+	for object := range s3Client.ListObjects(s3.Bucket, "logos/"+repo.RemotePath, true, doneCh) {
+		if object.Err != nil {
+			return nil, "", object.Err
+		}
+		o, err := s3Client.GetObject(s3.Bucket, object.Key, minio.GetObjectOptions{})
+		if err != nil {
+			log.Error(err)
+			return nil, "", err
+		}
+		defer o.Close()
+		data, err := ioutil.ReadAll(o)
+		return data, path.Ext(object.Key), err
+	}
+	return nil, "", nil
 }

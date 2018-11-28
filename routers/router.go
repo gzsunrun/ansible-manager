@@ -18,6 +18,7 @@ func init() {
 
 	authApi := beego.NewNamespace("/ansible",
 		beego.NSRouter("/login", &controllers.UserController{}, "post:Login"),
+		beego.NSRouter("/static/icon", &controllers.RepoController{}, "get:Icon"),
 	)
 
 	commonApi := beego.NewNamespace("/ansible/common",
@@ -60,7 +61,11 @@ func init() {
 		beego.NSRouter("/timer/get", &controllers.TimerController{}, "get:Get"),
 		beego.NSRouter("/timer/stop", &controllers.TimerController{}, "get:Stop"),
 		beego.NSRouter("/timer/start", &controllers.TimerController{}, "get:Start"),
-		beego.NSRouter("/timer/del", &controllers.TimerController{}, "get:Del"),
+		beego.NSRouter("/harbor/charts", &controllers.HarborController{}, "get:List"),
+		beego.NSRouter("/helm", &controllers.HelmController{}, "get:List;post:Install;delete:HelmDelete"),
+		beego.NSRouter("/helm/values", &controllers.HelmController{}, "get:GetValues"),
+		beego.NSRouter("/helm/hvalues", &controllers.HelmController{}, "get:GetHistoryValues"),
+		beego.NSRouter("/helm/status", &controllers.HelmController{}, "get:ReleaseStatus"),
 	)
 
 	beego.AddNamespace(authApi, commonApi)

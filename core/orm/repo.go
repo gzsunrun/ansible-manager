@@ -10,6 +10,8 @@ import (
 type Repository struct {
 	ID      string                   `xorm:"repo_id" json:"repo_id"`
 	Name    string                   `xorm:"repo_name" json:"repo_name"`
+	Version string                   `xorm:"repo_version" json:"repo_version"`
+	Type    string                   `xorm:"repo_type" json:"repo_type"`
 	Path    string                   `xorm:"repo_path" json:"repo_path"`
 	Group   []map[string]interface{} `xorm:"repo_group" json:"repo_group"`
 	Tag     []map[string]interface{} `xorm:"repo_tags" json:"repo_tags"`
@@ -24,6 +26,7 @@ type RepositoryInsert struct {
 	ID      string                   `xorm:"repo_id" json:"repo_id"`
 	Name    string                   `xorm:"repo_name" json:"repo_name"`
 	Version string                   `xorm:"repo_version" json:"repo_version"`
+	Type    string                   `xorm:"repo_type" json:"repo_type"`
 	Path    string                   `xorm:"repo_path" json:"repo_path"`
 	Group   []map[string]interface{} `xorm:"repo_group" json:"repo_group"`
 	Tag     []map[string]interface{} `xorm:"repo_tags" json:"repo_tags"`
@@ -37,7 +40,9 @@ type RepositoryInsert struct {
 type RepositoryList struct {
 	ID      string                   `xorm:"repo_id" json:"repo_id"`
 	Name    string                   `xorm:"repo_name" json:"repo_name"`
-	Path    string                   `xorm:"repo_path" json:"-"`
+	Version string                   `xorm:"repo_version" json:"repo_version"`
+	Type    string                   `xorm:"repo_type" json:"repo_type"`
+	Path    string                   `xorm:"repo_path" json:"repo_path"`
 	Group   []map[string]interface{} `xorm:"repo_group" json:"-"`
 	Tag     []map[string]interface{} `xorm:"repo_tags" json:"-"`
 	Vars    []Vars                   `xorm:"repo_vars" json:"-"`
@@ -81,9 +86,9 @@ func GetRepoByPath(path string) (res bool) {
 }
 
 // GetRepoByName get repo by name
-func GetRepoByName(name string) (*Repository, bool, error) {
+func GetRepoByName(name, version string) (*Repository, bool, error) {
 	var repo Repository
-	res, err := MysqlDB.Table("ansible_repository").Where("repo_name=?", name).Get(&repo)
+	res, err := MysqlDB.Table("ansible_repository").Where("repo_name=? and repo_version=?", name, version).Get(&repo)
 	if err != nil {
 		log.Error(err)
 		return nil, false, err
@@ -92,8 +97,12 @@ func GetRepoByName(name string) (*Repository, bool, error) {
 }
 
 // FindRepos find all repos
-func FindRepos(repos interface{}) error {
-	err := MysqlDB.Table("ansible_repository").OrderBy("repo_name asc").Find(repos)
+func FindRepos(repos interface{}, repoType ...string) error {
+	class := "ansible"
+	if len(repoType) > 0 {
+		class = repoType[0]
+	}
+	err := MysqlDB.Table("ansible_repository").Where("repo_type=?", class).OrderBy("repo_name asc").Find(repos)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -114,7 +123,7 @@ func CreateRepo(repo RepositoryInsert) error {
 func CreateRepos(repos []RepositoryInsert) error {
 	session := MysqlDB.NewSession()
 	for _, v := range repos {
-		_, res, err := GetRepoByName(v.Name)
+		_, res, err := GetRepoByName(v.Name, v.Version)
 		if err != nil {
 			return err
 		}

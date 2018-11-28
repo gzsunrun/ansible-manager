@@ -2,7 +2,10 @@ package storage
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
+	"path"
+	"strings"
 
 	"github.com/hashwing/log"
 )
@@ -73,4 +76,20 @@ func (local *LocalStorage) Delete(repo *StorageParse) error {
 // Share share file
 func (local *LocalStorage) Share(repo *StorageParse) (string, error) {
 	return "", nil
+}
+
+// GetIO download file
+func (local *LocalStorage) GetIO(repo *StorageParse) ([]byte, string, error) {
+	infos, err := ioutil.ReadDir(local.LocalPath + "/logos")
+	if err != nil {
+		return nil, "", err
+	}
+	for _, info := range infos {
+		if strings.HasPrefix(info.Name(), repo.LocalPath) {
+			data, err := ioutil.ReadFile(local.LocalPath + "/logos/" + info.Name())
+			return data, path.Ext(info.Name()), err
+		}
+
+	}
+	return nil, "", nil
 }

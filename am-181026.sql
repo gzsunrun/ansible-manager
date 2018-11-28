@@ -6,3 +6,6 @@ ADD COLUMN `host_tag`  int NULL AFTER `host_ip`;
 
 ALTER TABLE `ansible_repository`
 ADD COLUMN `repo_version`  varchar(255) NULL AFTER `repo_name`;
+
+ALTER TABLE `ansible_repository`
+ADD COLUMN `repo_type`  varchar(255) NULL DEFAULT "ansible" AFTER `repo_version`;

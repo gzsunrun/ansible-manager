@@ -524,7 +524,7 @@ function AjaxReq(type, url,data, before, success, err) {
       if (XMLHttpRequest.status==401||XMLHttpRequest.status==403){
         $(top.location).attr("href","../ui/login.html")
       }
-      err
+      err(XMLHttpRequest, textStatus, errorThrown)
     }
   })
 }

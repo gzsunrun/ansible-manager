@@ -16,6 +16,7 @@ type FileStorage interface {
 	Get(*StorageParse) error
 	Delete(*StorageParse) error
 	Share(*StorageParse) (string, error)
+	GetIO(repo *StorageParse) ([]byte, string, error)
 }
 
 // Storage grobal storage

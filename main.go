@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gzsunrun/ansible-manager/asset"
 	"github.com/gzsunrun/ansible-manager/core/config"
+	"github.com/gzsunrun/ansible-manager/core/helm"
 	"github.com/gzsunrun/ansible-manager/core/kv"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/role"
@@ -36,6 +37,7 @@ func run() {
 		log.Error(err)
 		return
 	}
+	helm.InitHarbor(config.Cfg.Harbor.URL, config.Cfg.Harbor.Repo)
 	os.MkdirAll(config.Cfg.Common.WorkPath, 0664)
 	sockets.StartWS()
 	err = storage.SetStorage()
@@ -61,8 +63,8 @@ func run() {
 			log.Error(err)
 			return
 		}
-		beego.SetStaticPath("/ui", "/var/lib/amgr/public")
-		//beego.SetStaticPath("/ui", "./public/")
+		//beego.SetStaticPath("/ui", "/var/lib/amgr/public")
+		beego.SetStaticPath("/ui", "./public/")
 	}
 	beego.BConfig.Listen.HTTPPort = config.Cfg.Common.Port
 	beego.Run()

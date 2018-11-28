@@ -48,3 +48,8 @@ func (g *Git) Delete(repo *StorageParse) error {
 func (g *Git) Share(repo *StorageParse) (string, error) {
 	return "", nil
 }
+
+// GetIO download file
+func (local *Git) GetIO(repo *StorageParse) ([]byte, string, error) {
+	return nil, "", nil
+}

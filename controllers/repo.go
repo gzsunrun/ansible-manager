@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"io/ioutil"
 	"os"
 
 	"github.com/gzsunrun/ansible-manager/core/config"
 	"github.com/gzsunrun/ansible-manager/core/function"
+	"github.com/gzsunrun/ansible-manager/core/helm"
 	"github.com/gzsunrun/ansible-manager/core/orm"
 	"github.com/gzsunrun/ansible-manager/core/storage"
 	"github.com/gzsunrun/ansible-manager/core/template"
@@ -19,13 +21,30 @@ type RepoController struct {
 // List get repo list
 func (c *RepoController) List() {
 	defer c.ServeJSON()
+	class := c.GetString("repo_type", "ansible")
 	var repos []orm.RepositoryList
-	err := orm.FindRepos(&repos)
+	err := orm.FindRepos(&repos, class)
 	if err != nil {
 		c.SetResult(err, nil, 400)
 		return
 	}
 	c.SetResult(nil, repos, 200)
+}
+
+func (c *RepoController) Icon() {
+	id := c.GetString("id")
+	repoParse := &storage.StorageParse{
+		RemotePath: id,
+	}
+
+	data, contentType, err := storage.Storage.GetIO(repoParse)
+	if err != nil {
+		log.Error(err)
+		c.SetResult(err, nil, 500)
+		return
+	}
+	c.Ctx.Output.ContentType(contentType)
+	c.Ctx.Output.Body(data)
 }
 
 // Create create repo
@@ -49,14 +68,20 @@ func (c *RepoController) Create() {
 		return
 	}
 	defer os.Remove(config.Cfg.Common.WorkPath + "/" + repoPath)
-	defer os.RemoveAll(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir")
+	//defer os.RemoveAll(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir")
 	// err = function.ReadVars(config.Cfg.Common.WorkPath+"/"+repoPath, &repo)
 	// if err != nil {
 	// 	c.SetResult(err, nil, 400)
 	// 	return
 	// }
-	tpls, err := template.ReadVars(config.Cfg.Common.WorkPath+"/"+repoPath, repoPath)
+	var tpls []orm.RepositoryInsert
+	if c.GetString("repo_type") == "helm" {
+		tpls, err = helm.ReadChart(config.Cfg.Common.WorkPath+"/"+repoPath, repoPath)
+	} else {
+		tpls, err = template.ReadVars(config.Cfg.Common.WorkPath+"/"+repoPath, repoPath)
+	}
 	if err != nil {
+		log.Error(err)
 		c.SetErrMsg(400, err.Error())
 		return
 	}
@@ -67,11 +92,12 @@ func (c *RepoController) Create() {
 	if c.GetString("repo_desc") != "" {
 		repo.Desc = c.GetString("repo_desc")
 	}
-	_, err = os.Stat(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo.png")
-	if err == nil || os.IsExist(err) {
+	logoInfo, _ := ioutil.ReadDir(config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo")
+	for _, info := range logoInfo {
+		log.Debug(info.Name())
 		logoParse := storage.StorageParse{
-			LocalPath:  config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo.png",
-			RemotePath: repoPath + ".png",
+			LocalPath:  config.Cfg.Common.WorkPath + "/" + repoPath + "_dir/logo/" + info.Name(),
+			RemotePath: "logos/" + info.Name(),
 		}
 		err = storage.Storage.Put(&logoParse)
 		if err != nil {
