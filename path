@@ -1,0 +1,18 @@
+eeeee
+123
+[DOWNLOAD REPOSITORY]
+ok: finish 
+ 
+[INSTALL HOSTS AND VARS]
+ok: finish 
+ 
+
+PLAY [all] *********************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [host161]
+
+TASK [write the apache config file] ********************************************
+ok: [host161]
+
+TASK [waiting] *****************************************************************

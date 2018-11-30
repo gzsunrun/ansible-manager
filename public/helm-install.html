@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ansible Manager</title>
+    <!-- zui css -->
+    <link rel="stylesheet" href="dist/css/zui.min.css">
+    <link rel="stylesheet" href="dist/theme/blue.css">
+    <!-- app css -->
+    <link rel="stylesheet" href="css/app.css">
+    <!-- jquery js -->
+    <script src="dist/lib/jquery/jquery.js"></script>
+    <script src="dist/lib/jquery/jquery.cookie.js"></script>
+
+    <!-- codemirror -->
+    <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css">
+    <link href="codemirror/theme/monokai.css" rel="stylesheet" type="text/css">
+    <link href="codemirror/addon/display/fullscreen.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="content-header">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">
+                        <i class="icon icon-home"></i>
+                    </a>
+                </li>
+                <li class="active">helm管理</li>
+                <li class="active">配置</li>
+            </ul>
+        </div>
+        <div class="content-body">
+            <div class="container-fluid">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div class="panel-title">信息配置</div>
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="exampleInputAccount4" class="col-sm-1">Chart</label>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control" id="chart-name" disabled>
+                                </div>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control" id="chart-version" disabled/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword4" class="col-sm-1">发布名称</label>
+                                <div class="col-md-6 col-sm-10">
+                                    <input type="text" class="form-control" id="release-name" placeholder="发布名称">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputAddress1" class="col-sm-1">集群</label>
+                                <div class="col-sm-3">
+                                    <select class="form-control" id="project-list">
+                                        <option>选择集群</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                    <label for="exampleInputPassword4" class="col-sm-1">namespace</label>
+                                    <div class="col-md-6 col-sm-10">
+                                        <input type="text" class="form-control" id="namespace" placeholder="namespace">
+                                    </div>
+                            </div>
+                            <div class="form-group">
+                                    <div class="col-md-10 col-sm-10">
+                                       <textarea id="code" name="code"></textarea>
+                                    </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="panel-footer">
+                            <button id="release-btn" class="btn btn-default">发布</button>
+                    </div> 
+                    <div>
+                    </div>
+                </div>
+            </div>
+            <!-- zui js -->
+            <script src="dist/js/zui.min.js"></script>
+            <script type="text/javascript" src="codemirror/lib/codemirror.js"></script>
+            <script type="text/javascript" src="codemirror/mode/yaml/yaml.js"></script>
+            <script type="text/javascript" src="codemirror/addon/selection/active-line.js"></script>
+            <script type="text/javascript" src="codemirror/addon/edit/matchbrackets.js"></script>
+            <script type="text/javascript" src="codemirror/addon/display/fullscreen.js"></script>
+            <!-- app js -->
+            <script src="js/app.js"></script>
+            <script src="js/data/editor.js"></script>
+            <script src="js/data/install.js"></script>
+</body>
+
+</html>
