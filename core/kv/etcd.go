@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/hashwing/log"
-	"github.com/coreos/etcd/clientv3"
+	"go.etcd.io/etcd/clientv3"
 )
 
 var (

@@ -11,7 +11,7 @@ import:
   - context
   - logs
   - plugins/cors
-- package: github.com/coreos/etcd
+- package: go.etcd.io/etcd
   subpackages:
   - clientv3
 - package: github.com/dgrijalva/jwt-go
