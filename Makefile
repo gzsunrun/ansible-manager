@@ -4,8 +4,8 @@ NAME         	?= ansible-manager
 GO           	?= go
 SPECE_DIR       ?= ./_rpmbuild
 RPMBUILD_DIR	?= /root/rpmbuild
-VERSION = 2.4.1
-RELEASE = 5
+VERSION = 2.5.0
+RELEASE = 2
 DOCKERREPO = 192.168.1.100:5000
 
 all: pkg bindata build

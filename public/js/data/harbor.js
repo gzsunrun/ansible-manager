@@ -3,6 +3,10 @@ $(function(){
     GetRepoList()
 })
 
+$("#filter").on('input propertychange',function(){
+    GetRepoList()
+})
+
 
 
 // get host list
@@ -10,6 +14,10 @@ function GetRepoList() {
     var success = function (msg) {
         $("#repo-list").empty()
         $.each(msg, function (i, val) {
+            var keyword =$("#filter").val()
+            if (keyword!=null&&val.name.indexOf(keyword)==-1){
+                return 
+            }
            var versions =`<select  id="version-`+i+`">`
             $.each(val.charts,function(i,v){
                 versions  +=`<option value="`+v.version+`">`+ v.appVersion+"/"+v.version + `</option>`
