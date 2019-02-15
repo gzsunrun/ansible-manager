@@ -36,10 +36,11 @@ func ReadVars(filePath string, remotePath string) ([]orm.RepositoryInsert, error
 		log.Error(err)
 		return repos, err
 	}
-	cmd := exec.Command("tar", "zxvf", filePath, "-C", dir)
-	err = cmd.Run()
+	log.Debug(filePath)
+	cmd := exec.Command("tar", "zxf", filePath, "-C", dir)
+	errMsg, err := cmd.Output()
 	if err != nil {
-		log.Error(err)
+		log.Error("解压失败：", err, string(errMsg))
 		return repos, err
 	}
 

@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: ansible-manager
-        image: gzsunrun/ansible-manager:master
+        image: 192.168.1.100:5000/gzsunrun/ansible-manager:2.5.0-3
         imagePullPolicy: Always
         volumeMounts:
         - name: config-volume
