@@ -186,7 +186,11 @@ func (r *Runner) copyFile(content, dest string) error {
 
 }
 
-func (r *Runner) addHelmRepo(repo string) error {
+func (r *Runner) addHelmRepo(repo string, name ...string) error {
+	repoName := "ansible-manager"
+	if len(name) > 0 {
+		repoName = name[0]
+	}
 	c, err := r.client()
 	if err != nil {
 		log.Error(err)
@@ -198,9 +202,53 @@ func (r *Runner) addHelmRepo(repo string) error {
 		return err
 	}
 	defer session.Close()
-	output, err := session.CombinedOutput("helm repo add ansible-manager " + repo)
+	output, err := session.CombinedOutput("helm repo add " + repoName + " " + repo)
 	if err != nil {
 		log.Error(string(output))
+		return err
+	}
+	return nil
+}
+
+type ChartVesion struct {
+	Name    string
+	Version string
+}
+
+func (r *Runner) SyncHelmRepo(addr string, repos []ChartVesion) error {
+	c, err := r.client()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	session, err := c.NewSession()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	defer session.Close()
+	repoName := time.Now().UnixNano()
+	output, err := session.CombinedOutput(fmt.Sprintf("helm repo add sync-%d %s", repoName, addr))
+	if err != nil {
+		log.Error(string(output))
+		return err
+	}
+
+	for _, repo := range repos {
+		output1, err := session.CombinedOutput(fmt.Sprintf("helm fetch sync-%d/%s --version %s", repoName, repo.Name, repo.Version))
+		if err != nil {
+			log.Error(string(output1))
+			return err
+		}
+		output2, err := session.CombinedOutput(fmt.Sprintf("helm push sync-%d %s-%s.tgz", repoName, repo.Name, repo.Version))
+		if err != nil {
+			log.Error(string(output2))
+			return err
+		}
+	}
+	output3, err := session.CombinedOutput(fmt.Sprintf("helm repo remove sync-%d %s", repoName, addr))
+	if err != nil {
+		log.Error(string(output3))
 		return err
 	}
 	return nil

@@ -14,11 +14,20 @@ var MysqlDB *xorm.Engine
 // NewDB new db
 func NewDB() error {
 	var err error
-	dbURL := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
-		config.Cfg.Mysql.MysqlUser,
-		config.Cfg.Mysql.MysqlPassword,
-		config.Cfg.Mysql.MysqlURL,
-		config.Cfg.Mysql.MysqlName)
-	MysqlDB, err = xorm.NewEngine("mysql", dbURL)
+	if config.Cfg.DBDriver == "mysql" {
+		dbURL := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
+			config.Cfg.Mysql.MysqlUser,
+			config.Cfg.Mysql.MysqlPassword,
+			config.Cfg.Mysql.MysqlURL,
+			config.Cfg.Mysql.MysqlName)
+		MysqlDB, err = xorm.NewEngine("mysql", dbURL)
+		return err
+	}
+	MysqlDB, err = xorm.NewEngine("sqlite3", config.Cfg.Sqlite3.Path)
+	return err
+}
+
+func Import(path string) error {
+	_, err := MysqlDB.ImportFile(path)
 	return err
 }

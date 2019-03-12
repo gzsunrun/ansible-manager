@@ -16,6 +16,7 @@ import (
 	"github.com/gzsunrun/ansible-manager/core/tasks"
 	_ "github.com/gzsunrun/ansible-manager/routers"
 	"github.com/hashwing/log"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -51,6 +52,17 @@ func run() {
 		log.Error(err)
 		return
 	}
+	if len(os.Args) == 3 {
+		log.Info("ffff")
+		if os.Args[1] == "init" {
+			err := orm.Import(os.Args[2])
+			if err != nil {
+				log.Error(err)
+			}
+			log.Info("init finish")
+			return
+		}
+	}
 	role.Run()
 	beego.BConfig.AppName = "ansible-manager"
 	beego.BConfig.RunMode = beego.PROD
@@ -71,5 +83,6 @@ func run() {
 }
 
 func main() {
-	config.BackGroundService(SERVICENAME, SERVICEDESC, nil, run)
+	run()
+	//config.BackGroundService(SERVICENAME, SERVICEDESC, nil, run)
 }

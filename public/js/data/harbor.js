@@ -7,6 +7,28 @@ $("#filter").on('input propertychange',function(){
     GetRepoList()
 })
 
+$("#sync-commit").click(function(){
+    var addr=$("#repo-addr").val()
+    var names=$("#repo-names").val()
+    var $btn = $(this);
+    $btn.button('loading');
+
+    AjaxReq(
+        "get",
+        "../ansible/common/harbor/charts/sync",
+        {addr:addr,names:names},
+        function () { },
+        function (){
+            ReqSuccess()
+            $btn.button('reset');
+        },
+        function(){
+            ReqErr()
+            $btn.button('reset')
+        }
+    );
+})
+
 
 
 // get host list

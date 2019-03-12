@@ -12,7 +12,9 @@ import (
 // Config config strcut
 type Config struct {
 	Common       Common       `ini:"common"`
+	DBDriver     string       `ini:"db_driver"`
 	Mysql        Mysql        `ini:"mysql"`
+	Sqlite3      Sqlite3      `ini:"sqlite3"`
 	LocalStorage LocalStorage `ini:"local_storage"`
 	S3           S3           `ini:"s3_storage"`
 	Git          Git          `ini:"git_storage"`
@@ -38,6 +40,11 @@ type Mysql struct {
 	MysqlName     string `ini:"mysql_name"`
 	MysqlUser     string `ini:"mysql_user"`
 	MysqlPassword string `ini:"mysql_password"`
+}
+
+// Sqlite3
+type Sqlite3 struct {
+	Path string `ini:"path"`
 }
 
 // LocalStorage local storage for repo

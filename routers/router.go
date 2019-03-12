@@ -62,6 +62,7 @@ func init() {
 		beego.NSRouter("/timer/stop", &controllers.TimerController{}, "get:Stop"),
 		beego.NSRouter("/timer/start", &controllers.TimerController{}, "get:Start"),
 		beego.NSRouter("/harbor/charts", &controllers.HarborController{}, "get:List"),
+		beego.NSRouter("/harbor/charts/sync", &controllers.HarborController{}, "get:Sync"),
 		beego.NSRouter("/helm", &controllers.HelmController{}, "get:List;post:Install;delete:HelmDelete"),
 		beego.NSRouter("/helm/values", &controllers.HelmController{}, "get:GetValues"),
 		beego.NSRouter("/helm/hvalues", &controllers.HelmController{}, "get:GetHistoryValues"),
